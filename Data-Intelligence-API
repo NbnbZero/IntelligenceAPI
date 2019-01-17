@@ -49,21 +49,6 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -228,36 +213,21 @@ paths:
         description: message to post
         
         
-  /imageSet/retreive:
+  /augmentedReality/pullImage:
     get:
       tags:
         - AR
-      summary: retrieves conversation thread by UserID
-      operationId: searchUserID
+      summary: Retreives an Image Set with Given Tag
+      operationId: retrieveImageSet
       description: |
-        By specifying a UserID, you can retreive their conversation thread with the ChatBot
+        By specifying a Image Tag, an Image Set will return.
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: tag
+          description: A tag string used to describe an image.
+          required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -266,39 +236,24 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schemas/imageSet'
         '400':
           description: bad input parameter
-  /associatedModel/retreive:
+  /augmentedReality/pullModel:
     get:
       tags:
         - AR
-      summary: retrieves conversation thread by ConversationId
-      operationId: searchConversationId
+      summary: Retreives an Associated Model with Given Tag
+      operationId: retrieveAssociatedModel
       description: |
-        By specifying a UserID, you can retreive their conversation thread with the ChatBot
+        By specifying a Tag, an Associated Model will return.
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: tag
+          description: A tag string used to describe an associated model.
+          required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -307,86 +262,133 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schemas/associatedModel'
         '400':
           description: bad input parameter
           
-  /imageSet/tag:
+  /augmentedReality/publishImage:
     post:
       tags:
         - AR
-      summary: posts image with tag
+      summary: Posts an Image
       operationId: postImage
-      description: posts a provided image with a provided tag
+      description: Posts an Image to a database with a given Tag.
+      parameters:
+        - in: path
+          name: image
+          description: The Image to publish
+          required: true
+          schema:
+            type: object
+        - in: path
+          name: tag
+          description: Tag to associate image with
+          required: true
+          schema:
+            type: string
       responses:
         '201':
-          description: image and tag created
+          description: Image and Tag created
         '400':
           description: 'invalid input, object invalid'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/conversation'
+              $ref: '#/components/schemas/imageSet'
         description: image to post
-  /associatedModel/tag:
+  /augmentedReality/publishModel:
     post:
       tags:
         - AR
-      summary: posts image with tag
-      operationId: postImage
-      description: posts a provided image with a provided tag
+      summary: Post an Associated Model.
+      operationId: postAssociatedModel
+      description: Posts an Associated Model to a Database with a given Tag.
+      parameters:
+        - in: path
+          name: associatedModel
+          description: The Associated Model to publish
+          required: true
+          schema:
+            type: object
+        - in: path
+          name: tag
+          description: Tag to associate Associated Model with
+          required: true
+          schema:
+            type: string
       responses:
         '201':
-          description: image and tag created
+          description: Associated Model and Tag created
         '400':
           description: 'invalid input, object invalid'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/conversation'
-        description: image to post
-  /associatedModel/update:
+              $ref: '#/components/schemas/associatedModel'
+        description: Associated Model to Post.
+  /augmentedReality/updateModel:
     put:
       tags:
         - AR
       summary: Updates Associated Model
-      description: User may make changes to associated model
-      operationId: hideThread
+      description: User may make changes to Associated Model.
+      operationId: updateAssociatedModel
+      parameters:
+        - in: path
+          name: associatedModel
+          description: The Associated Model to publish
+          required: true
+          schema:
+            type: object
       responses:
         "400":
-          description: Invalid associated model supplied.
+          description: Invalid Associated Model supplied.
         "404":
           description: Associated Model not found.
-  /imageSet/delete:
+  /augmentedReality/removeImage:
     delete:
       tags:
         - AR
       summary: Deletes an Image 
-      description: Removes a specified image
+      description: Removes a specified image from the Database
       operationId: deleteImage
+      parameters:
+        - in: path
+          name: imageId
+          description: The image ID associated with the image to delete.
+          required: true
+          schema:
+            type: object
       responses:
         "400":
           description: Invalid image Id
       security:
         - user_auth:
-            - "write:conversation"
-            - "read:conversation"
-  /associatedModel/delete:
+            - "write:image"
+            - "read:image"
+  /augmentedReality/removeModel:
     delete:
       tags:
         - AR
       summary: Deletes an associated model.
       description: Removes a specified associated model.
       operationId: deleteAssociatedModel
+      parameters:
+        - in: path
+          name: associatedModelId
+          description: The associatedModelId tied to the model to delete.
+          required: true
+          schema:
+            type: object
       responses:
         "400":
           description: Invalid associated model Id
       security:
         - user_auth:
-            - "write:conversation"
-            - "read:conversation"
+            - "write:image"
+            - "read:image"
   /image:
     post:
       tags:
@@ -648,21 +650,61 @@ components:
     conversation:
       required:
         - conversationId
-        - name
         - date
         - users
       properties:
         conversationId:
           type: string
           example: ACME Corporation
-        name:
-          type: string
-          format: url
-          example: 'https://www.acme-corp.com'
         date:
           type: string
-          example: 408-867-5309
+          example: 1-23-2020
         users:
           type: string
           example: ben
+      type: object
+    associatedModel:
+      required:
+        - modelId
+        - modelName
+      properties:
+        modelId:
+          type: string
+          example: model123456
+        modelName:
+          type: string
+          example: Blue Ball
+      type: object
+    image:
+      required:
+        - imageId
+        - imageName
+        - imageSetId
+        - date
+      properties:
+        imageId:
+          type: string
+          example: image123456
+        imageName:
+          type: string
+          example: pic_of_dog
+        imageSetId:
+          type: string
+          example: imageSet123456
+          description: the image set the image is a part of
+        date:
+          type: string
+          example: 1-23-2020
+      type: object
+    imageSet:
+      required:
+        - imageSetId
+        - imageSetName
+      properties:
+        imageSetId:
+          type: string
+          example: imageSet123456
+        imageSetName:
+          type: string
+          example: pics_of_animals
       type: object
