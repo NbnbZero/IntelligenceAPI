@@ -44,9 +44,9 @@ paths:
         By specifying a UserID, you can retreive their conversation thread with the ChatBot
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
           schema:
             type: string
         - in: query
@@ -72,7 +72,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /conversation/conversation:
@@ -113,7 +113,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /message:
@@ -153,7 +153,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /conversation/remove:
@@ -224,7 +224,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InventoryItem'
+              $ref: '#/components/schemas/conversation'
         description: message to post
         
         
@@ -266,7 +266,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /associatedModel/retreive:
@@ -307,7 +307,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
           
@@ -327,7 +327,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InventoryItem'
+              $ref: '#/components/schemas/conversation'
         description: image to post
   /associatedModel/tag:
     post:
@@ -345,7 +345,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InventoryItem'
+              $ref: '#/components/schemas/conversation'
         description: image to post
   /associatedModel/update:
     put:
@@ -403,7 +403,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InventoryItem'
+              $ref: '#/components/schemas/conversation'
         description: image to post
   /dashboardWidgets/user:
     get:
@@ -443,7 +443,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /dashboardWidgets/widget:
@@ -484,7 +484,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /dashboardWidget/post:
@@ -503,7 +503,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InventoryItem'
+              $ref: '#/components/schemas/conversation'
         description: Widget to post
   /dashboardWidget/update:
     put:
@@ -569,7 +569,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /search/post:
@@ -588,7 +588,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InventoryItem'
+              $ref: '#/components/schemas/conversation'
         description: File to Search
   /ssl/retreive:
     get:
@@ -628,7 +628,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InventoryItem'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /ssl/renew:
@@ -645,39 +645,24 @@ paths:
           description: SSL Cert not found.
 components:
   schemas:
-    InventoryItem:
-      type: object
+    conversation:
       required:
-        - id
+        - conversationId
         - name
-        - manufacturer
-        - releaseDate
+        - date
+        - users
       properties:
-        id:
-          type: string
-          format: uuid
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        name:
-          type: string
-          example: Widget Adapter
-        releaseDate:
-          type: string
-          format: date-time
-          example: '2016-08-29T09:12:33.001Z'
-        manufacturer:
-          $ref: '#/components/schemas/Manufacturer'
-    Manufacturer:
-      required:
-        - name
-      properties:
-        name:
+        conversationId:
           type: string
           example: ACME Corporation
-        homePage:
+        name:
           type: string
           format: url
           example: 'https://www.acme-corp.com'
-        phone:
+        date:
           type: string
           example: 408-867-5309
+        users:
+          type: string
+          example: ben
       type: object
