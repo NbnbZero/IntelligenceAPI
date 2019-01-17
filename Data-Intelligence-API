@@ -22,25 +22,26 @@ tags:
   - name: private
     description: private tag
   - name: AIML
-    description: AIML tag
+    description: AIML Routes
   - name: AR
-    description: AR tag
+    description: AR Routes
   - name: Cognitive Learning
-    description: Cognitive Learning Tag
-  - name: IOT
-    description: IOT
+    description: Cognitive Learning Routes
+  - name: IoT Dashboard
+    description: IoT Routes
   - name: Search
-    description: Search Tag
+    description: Semantic Search Routes
+  - name: SSL
+    description: SSL Provisioning Routes
 paths:
-  /inventory:
+  /conversation/user:
     get:
       tags:
-        - developers
-      summary: searches inventory
-      operationId: searchInventory
+        - AIML
+      summary: retrieves conversation thread by UserID
+      operationId: searchUserID
       description: |
-        By passing in the appropriate options, you can search for
-        available inventory in the system
+        By specifying a UserID, you can retreive their conversation thread with the ChatBot
       parameters:
         - in: query
           name: searchString
@@ -74,25 +75,574 @@ paths:
                   $ref: '#/components/schemas/InventoryItem'
         '400':
           description: bad input parameter
+  /conversation/conversation:
+    get:
+      tags:
+        - AIML
+      summary: retrieves conversation thread by ConversationId
+      operationId: searchConversationId
+      description: |
+        By specifying a UserID, you can retreive their conversation thread with the ChatBot
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+  /message:
+    get:
+      tags:
+        - AIML
+      summary: retrieves message from conversation
+      operationId: searchUserID
+      description: by specifying a message and conversation Id, it retrieves the message
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+  /conversation/remove:
+    delete:
+      tags:
+        - AIML
+      summary: Deletes a conversation thread
+      description: Removes a specified conversation thread
+      operationId: deleteThread
+      responses:
+        "400":
+          description: Invalid conversation Id
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+  /message/remove:
+    delete:
+      tags:
+        - AIML
+      summary: Deletes a message from a Conversation 
+      description: Removes a specified message from a specified thread
+      operationId: deleteMessage
+      responses:
+        "400":
+          description: Invalid conversation Id
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+  /message/hide:
+    put:
+      tags:
+        - AIML
+      summary: Hide conversation thread
+      description: Logged in User may hide a conversation thread.
+      operationId: hideThread
+      responses:
+        "400":
+          description: Invalid conversation id supplied.
+        "404":
+          description: Conversation not found.
+  /conversation/hide:
+    put:
+      tags:
+        - AIML
+      summary: Hide message in thread
+      description: Logged in User may hide their message in a thread.
+      operationId: hideThread
+      responses:
+        "400":
+          description: Invalid message id supplied.
+        "404":
+          description: Message not found.
+  /message/post:
     post:
       tags:
-        - admins
-      summary: adds an inventory item
-      operationId: addInventory
-      description: Adds an item to the system
+        - AIML
+      summary: posts message to conversation thread
+      operationId: postMessage
+      description: posts a provided string message to the conversation thread
       responses:
         '201':
-          description: item created
+          description: message created
         '400':
           description: 'invalid input, object invalid'
-        '409':
-          description: an existing item already exists
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/InventoryItem'
-        description: Inventory item to add
+        description: message to post
+        
+        
+  /imageSet/retreive:
+    get:
+      tags:
+        - AR
+      summary: retrieves conversation thread by UserID
+      operationId: searchUserID
+      description: |
+        By specifying a UserID, you can retreive their conversation thread with the ChatBot
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+  /associatedModel/retreive:
+    get:
+      tags:
+        - AR
+      summary: retrieves conversation thread by ConversationId
+      operationId: searchConversationId
+      description: |
+        By specifying a UserID, you can retreive their conversation thread with the ChatBot
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+          
+  /imageSet/tag:
+    post:
+      tags:
+        - AR
+      summary: posts image with tag
+      operationId: postImage
+      description: posts a provided image with a provided tag
+      responses:
+        '201':
+          description: image and tag created
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        description: image to post
+  /associatedModel/tag:
+    post:
+      tags:
+        - AR
+      summary: posts image with tag
+      operationId: postImage
+      description: posts a provided image with a provided tag
+      responses:
+        '201':
+          description: image and tag created
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        description: image to post
+  /associatedModel/update:
+    put:
+      tags:
+        - AR
+      summary: Updates Associated Model
+      description: User may make changes to associated model
+      operationId: hideThread
+      responses:
+        "400":
+          description: Invalid associated model supplied.
+        "404":
+          description: Associated Model not found.
+  /imageSet/delete:
+    delete:
+      tags:
+        - AR
+      summary: Deletes an Image 
+      description: Removes a specified image
+      operationId: deleteImage
+      responses:
+        "400":
+          description: Invalid image Id
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+  /associatedModel/delete:
+    delete:
+      tags:
+        - AR
+      summary: Deletes an associated model.
+      description: Removes a specified associated model.
+      operationId: deleteAssociatedModel
+      responses:
+        "400":
+          description: Invalid associated model Id
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+  /image:
+    post:
+      tags:
+        - Cognitive Learning
+      summary: posts image 
+      operationId: postImage
+      description: posts a provided image
+      responses:
+        '201':
+          description: image created
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        description: image to post
+  /dashboardWidgets/user:
+    get:
+      tags:
+        - IoT Dashboard
+      summary: retrieves list of Dashboard Widgets
+      operationId: widgetsUser
+      description: |
+        By specifying a UserID, you can retreive their Dashboard Widgets
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+  /dashboardWidgets/widget:
+    get:
+      tags:
+        - IoT Dashboard
+      summary: retrieves a Dashboard Widget
+      operationId: widgetsId
+      description: |
+        By specifying a widgetId, you can retreive the Dashboard Widget
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+  /dashboardWidget/post:
+    post:
+      tags:
+        - Cognitive Learning
+      summary: Posts a Dashboard Widget 
+      operationId: postWidget
+      description: posts a provided Widget
+      responses:
+        '201':
+          description: Widget created
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        description: Widget to post
+  /dashboardWidget/update:
+    put:
+      tags:
+        - Cognitive Learning
+      summary: Updates a DashBoard Widget 
+      description: User may make changes to current Dashboard Widget
+      operationId: updateWidget
+      responses:
+        "400":
+          description: Invalid Widget supplied.
+        "404":
+          description: Widget not found.
+  /dashboardWidget/delete:
+    delete:
+      tags:
+        - Cognitive Learning
+      summary: Deletes an Dashboard Widget.
+      description: Removes a specified Dashboard Widget.
+      operationId: deleteDashboardWidget
+      responses:
+        "400":
+          description: Invalid Dashboard Widget Id
+      security:
+        - user_auth:
+            - "write:Widget"
+            - "read:Widget"
+  /search/get:
+    get:
+      tags:
+        - Search
+      summary: Performs Semantic Search
+      operationId: search
+      description: |
+        Semantic Search a given file.
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+  /search/post:
+    post:
+      tags:
+        - Search
+      summary: Uploads a Document
+      operationId: searchDocument
+      description: Uploads a Document containing the Semantic Search Results
+      responses:
+        '201':
+          description: Search Finished, Document Uploaded
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        description: File to Search
+  /ssl/retreive:
+    get:
+      tags:
+        - SSL
+      summary: Retrieves a SSL Certificate
+      operationId: retrieveSSL
+      description: |
+        Provides a SSL Certificate
+      parameters:
+        - in: query
+          name: searchString
+          description: pass an optional search string for looking up inventory
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: bad input parameter
+  /ssl/renew:
+    put:
+      tags:
+        - SSL
+      summary: Renews a SSL Certificate
+      description: User may Renew SSL Certificate
+      operationId: sslRenew
+      responses:
+        "400":
+          description: Invalid SSL supplied.
+        "404":
+          description: SSL Cert not found.
 components:
   schemas:
     InventoryItem:
