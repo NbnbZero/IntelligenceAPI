@@ -407,36 +407,21 @@ paths:
             schema:
               $ref: '#/components/schemas/conversation'
         description: image to post
-  /dashboardWidgets/user:
+  /dashboardWidgets/userId:
     get:
       tags:
-        - IoT Dashboard
+        - IoT 
       summary: retrieves list of Dashboard Widgets
       operationId: widgetsUser
       description: |
         By specifying a UserID, you can retreive their Dashboard Widgets
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: getWidgetsUser
+          description: pass an userId to retrieve their Dashboard Widgets
+          required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -445,13 +430,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schema/widgets'
         '400':
           description: bad input parameter
-  /dashboardWidgets/widget:
+  /dashboardWidgets/widgetId:
     get:
       tags:
-        - IoT Dashboard
+        - IoT 
       summary: retrieves a Dashboard Widget
       operationId: widgetsId
       description: |
@@ -459,25 +444,12 @@ paths:
       parameters:
         - in: query
           name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
+          description: pass a widgetId to retrieve the Dashboard Widget
+          required: true
           schema:
             type: integer
             format: int32
             minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -486,13 +458,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schemas/widgets'
         '400':
           description: bad input parameter
   /dashboardWidget/post:
     post:
       tags:
-        - Cognitive Learning
+        - IoT
       summary: Posts a Dashboard Widget 
       operationId: postWidget
       description: posts a provided Widget
@@ -505,12 +477,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/conversation'
+              $ref: '#/components/schemas/widgets'
         description: Widget to post
   /dashboardWidget/update:
     put:
       tags:
-        - Cognitive Learning
+        - IoT
       summary: Updates a DashBoard Widget 
       description: User may make changes to current Dashboard Widget
       operationId: updateWidget
@@ -522,7 +494,7 @@ paths:
   /dashboardWidget/delete:
     delete:
       tags:
-        - Cognitive Learning
+        - IoT
       summary: Deletes an Dashboard Widget.
       description: Removes a specified Dashboard Widget.
       operationId: deleteDashboardWidget
