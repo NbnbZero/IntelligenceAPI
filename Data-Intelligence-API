@@ -27,7 +27,7 @@ tags:
     description: AR Routes
   - name: Cognitive Learning
     description: Cognitive Learning Routes
-  - name: IoT 
+  - name: IoT Dashboard
     description: IoT Routes
   - name: Search
     description: Semantic Search Routes
@@ -230,15 +230,15 @@ paths:
             type: string
       responses:
         '200':
-          description: search results matching criteria
+          description: Returning Image Object and Associated Tag
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 items:
                   $ref: '#/components/schemas/imageSet'
         '400':
-          description: bad input parameter
+          description: Bad Input
   /augmentedReality/pullModel:
     get:
       tags:
@@ -256,15 +256,15 @@ paths:
             type: string
       responses:
         '200':
-          description: search results matching criteria
+          description: Returning Associated Model and Tag
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 items:
                   $ref: '#/components/schemas/associatedModel'
         '400':
-          description: bad input parameter
+          description: Bad Input.
           
   /augmentedReality/publishImage:
     post:
@@ -289,8 +289,14 @@ paths:
       responses:
         '201':
           description: Image and Tag created
+        '204':
+          description: Request Processed
         '400':
-          description: 'invalid input, object invalid'
+          description: 'Invalid input, image object invalid.'
+        '401':
+          description: 'Unauthorized to Publish Image.'
+        '404':
+          description: 'Requested Resource not Found.'
       requestBody:
         content:
           application/json:
@@ -320,8 +326,14 @@ paths:
       responses:
         '201':
           description: Associated Model and Tag created
+        '204':
+          description: Request Processed
         '400':
-          description: 'invalid input, object invalid'
+          description: 'Invalid input, associated model invalid.'
+        '401':
+          description: 'Unauthorized to Publish Model.'
+        '404':
+          description: 'Requested Resource not Found.'
       requestBody:
         content:
           application/json:
@@ -344,9 +356,11 @@ paths:
             type: object
       responses:
         "400":
-          description: Invalid Associated Model supplied.
+          description: 'Invalid Associated Model supplied.'
+        "401":
+          description: 'Unauthorized to update model.'
         "404":
-          description: Associated Model not found.
+          description: 'Associated Model not found.'
   /augmentedReality/removeImage:
     delete:
       tags:
@@ -363,7 +377,11 @@ paths:
             type: object
       responses:
         "400":
-          description: Invalid image Id
+          description: "Invalid image Id"
+        "401":
+          description: "Unauthorized to Delete Image"
+        "404":
+          description: "Image not found."
       security:
         - user_auth:
             - "write:image"
@@ -384,7 +402,11 @@ paths:
             type: object
       responses:
         "400":
-          description: Invalid associated model Id
+          description: 'Invalid associated model Id.'
+        "401":
+          description: 'Unauthorized to Delete Image.'
+        "404":
+          description: 'Associated Model Not Found.'
       security:
         - user_auth:
             - "write:image"
@@ -405,7 +427,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/conversation'
+              $ref: '#/components/schemas/image'
         description: image to post
   /dashboardWidgets/userId:
     get:
@@ -515,43 +537,29 @@ paths:
         Semantic Search a given file.
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: searchFile
+          description: pass the name of a PyText file for searching
+          required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
-          description: search results matching criteria
+          description: return fileID and fileName that are semantically searched
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schemas/searchFile'
         '400':
           description: bad input parameter
+          
   /search/post:
     post:
       tags:
         - Search
       summary: Uploads a Document
-      operationId: searchDocument
+      operationId: postDocument
       description: Uploads a Document containing the Semantic Search Results
       responses:
         '201':
@@ -562,8 +570,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/conversation'
+              $ref: '#/components/schemas/searchFile'
         description: File to Search
+        
   /ssl/retreive:
     get:
       tags:
@@ -680,15 +689,15 @@ components:
           type: string
           example: pics_of_animals
       type: object
-	widget:
+    searchFile:
       required:
-        - userId
-        - widgetId
+        - searchFileID
+        - searchFileName
       properties:
-        userId:
+        searchFileID:
           type: string
-          example: name123456
-        widgetId:
-          type: integer
-          example: 12345
+          example: searchFile001
+        searchFileName:
+          type: string
+          example: file_to_search
       type: object
