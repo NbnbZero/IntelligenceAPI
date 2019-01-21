@@ -701,3 +701,15 @@ components:
           type: string
           example: file_to_search
       type: object
+	widget:
+      required:
+        - userId
+        - widgetId
+      properties:
+        userId:
+          type: string
+          example: name123456
+        widgetId:
+          type: integer
+          example: 12345
+      type: object
