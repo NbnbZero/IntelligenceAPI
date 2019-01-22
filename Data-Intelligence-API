@@ -555,7 +555,7 @@ paths:
         - user_auth:
             - "write:Widget"
             - "read:Widget"
-  /search/get:
+  /search:
     get:
       tags:
         - Search
@@ -582,7 +582,6 @@ paths:
         '400':
           description: bad input parameter
           
-  /search/post:
     post:
       tags:
         - Search
