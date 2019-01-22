@@ -27,7 +27,7 @@ tags:
     description: AR Routes
   - name: Cognitive Learning
     description: Cognitive Learning Routes
-  - name: IoT Dashboard
+  - name: IoT 
     description: IoT Routes
   - name: Search
     description: Semantic Search Routes
