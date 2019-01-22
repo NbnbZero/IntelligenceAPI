@@ -193,18 +193,24 @@ paths:
             schema:
               $ref: '#/components/schemas/conversation'
         description: message to post
-  /augmentedReality/pullImage:
+  /augmentedReality/{userId}/{imageTag}:
     get:
       tags:
         - AR
-      summary: Retreives an Image Set with Given Tag
+      summary: Retreives an Image Set 
       operationId: retrieveImageSet
       description: |
-        By specifying a Image Tag, an Image Set will return.
+        Retrieve the content of the Image Set for the specified image Tag associated with a specified user.
       parameters:
-        - in: query
-          name: tag
+        - in: path
+          name: imageTag
           description: A tag string used to describe an image.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: A userID to pull image set from
           required: true
           schema:
             type: string
@@ -219,7 +225,11 @@ paths:
                   $ref: '#/components/schemas/imageSet'
         '400':
           description: Bad Input
-  /augmentedReality/pullModel:
+        '404':
+          description: "User not found"
+        '500':
+          description: "Server error"
+  /augmentedReality/{userId}/{associatedModelTag}:
     get:
       tags:
         - AR
@@ -228,9 +238,15 @@ paths:
       description: |
         By specifying a Tag, an Associated Model will return.
       parameters:
-        - in: query
-          name: tag
+        - in: path
+          name: associatedModelTag
           description: A tag string used to describe an associated model.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: A userID to pull associatedModel from
           required: true
           schema:
             type: string
@@ -245,45 +261,11 @@ paths:
                   $ref: '#/components/schemas/associatedModel'
         '400':
           description: Bad Input.
-          
-  /augmentedReality/publishImage:
-    post:
-      tags:
-        - AR
-      summary: Posts an Image
-      operationId: postImage
-      description: Posts an Image to a database with a given Tag.
-      parameters:
-        - in: path
-          name: image
-          description: The Image to publish
-          required: true
-          schema:
-            type: object
-        - in: path
-          name: tag
-          description: Tag to associate image with
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Image and Tag created
-        '204':
-          description: Request Processed
-        '400':
-          description: 'Invalid input, image object invalid.'
-        '401':
-          description: 'Unauthorized to Publish Image.'
         '404':
-          description: 'Requested Resource not Found.'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/imageSet'
-        description: image to post
-  /augmentedReality/publishModel:
+          description: "User not found"
+        '500':
+          description: "Server error"
+  /augmentedReality/{userId}/{associatedModelId}:
     post:
       tags:
         - AR
@@ -292,14 +274,20 @@ paths:
       description: Posts an Associated Model to a Database with a given Tag.
       parameters:
         - in: path
-          name: associatedModel
+          name: associatedModelId
           description: The Associated Model to publish
           required: true
           schema:
             type: object
-        - in: path
+        - in: query
           name: tag
           description: Tag to associate Associated Model with
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: user id of user posting model
           required: true
           schema:
             type: string
@@ -320,7 +308,6 @@ paths:
             schema:
               $ref: '#/components/schemas/associatedModel'
         description: Associated Model to Post.
-  /augmentedReality/updateModel:
     put:
       tags:
         - AR
@@ -329,11 +316,17 @@ paths:
       operationId: updateAssociatedModel
       parameters:
         - in: path
-          name: associatedModel
-          description: The Associated Model to publish
+          name: associatedModelId
+          description: The Associated Model Id to publish
           required: true
           schema:
             type: object
+        - in: path
+          name: userId
+          description: The userID of user posting image.
+          required: true
+          schema:
+            type: string
       responses:
         "400":
           description: 'Invalid Associated Model supplied.'
@@ -341,32 +334,6 @@ paths:
           description: 'Unauthorized to update model.'
         "404":
           description: 'Associated Model not found.'
-  /augmentedReality/removeImage:
-    delete:
-      tags:
-        - AR
-      summary: Deletes an Image 
-      description: Removes a specified image from the Database
-      operationId: deleteImage
-      parameters:
-        - in: path
-          name: imageId
-          description: The image ID associated with the image to delete.
-          required: true
-          schema:
-            type: object
-      responses:
-        "400":
-          description: "Invalid image Id"
-        "401":
-          description: "Unauthorized to Delete Image"
-        "404":
-          description: "Image not found."
-      security:
-        - user_auth:
-            - "write:image"
-            - "read:image"
-  /augmentedReality/removeModel:
     delete:
       tags:
         - AR
@@ -380,6 +347,12 @@ paths:
           required: true
           schema:
             type: object
+        - in: path
+          name: userId
+          description: The userID of user posting image.
+          required: true
+          schema:
+            type: string
       responses:
         "400":
           description: 'Invalid associated model Id.'
@@ -387,6 +360,79 @@ paths:
           description: 'Unauthorized to Delete Image.'
         "404":
           description: 'Associated Model Not Found.'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
+  /augmentedReality/{userId}/{imageId}:
+    post:
+      tags:
+        - AR
+      summary: Posts an Image
+      operationId: postImage
+      description: Posts an Image to a database with a given Tag.
+      parameters:
+        - in: path
+          name: imageId
+          description: The Image to publish
+          required: true
+          schema:
+            type: object
+        - in: query
+          name: tag
+          description: Tag to associate image with
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: The ID associated with User Posting the image.
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Image and Tag created
+        '204':
+          description: Request Processed
+        '400':
+          description: 'Invalid input, image object invalid.'
+        '401':
+          description: 'Unauthorized to Publish Image.'
+        '404':
+          description: 'Requested Resource not Found.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/imageSet'
+        description: image to post
+    delete:
+      tags:
+        - AR
+      summary: Deletes an Image 
+      description: Removes a specified image from the Database
+      operationId: deleteImage
+      parameters:
+        - in: path
+          name: imageId
+          description: The image ID associated with the image to delete.
+          required: true
+          schema:
+            type: object
+        - in: path
+          name: userId
+          description: the user id of the user removing the image
+          required: true
+          schema:
+            type: string
+      responses:
+        "400":
+          description: "Invalid image Id"
+        "401":
+          description: "Unauthorized to Delete Image"
+        "404":
+          description: "Image not found."
       security:
         - user_auth:
             - "write:image"
@@ -432,7 +478,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schema/widgets'
+                  $ref: '#/components/schemas/widgets'
         '400':
           description: bad input parameter
   /dashboardWidgets/widgetId:
@@ -553,7 +599,7 @@ paths:
               $ref: '#/components/schemas/searchFile'
         description: File to Search
         
-  /ssl/retrieve:
+  /ssl/retreive:
     get:
       tags:
         - SSL
@@ -563,11 +609,26 @@ paths:
         Provides a SSL Certificate
       parameters:
         - in: query
-          name: searchSSL
-          description: providing SSL id, get the certificate
+          name: searchString
+          description: pass an optional search string for looking up inventory
           required: false
           schema:
             type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -576,14 +637,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ssl'
+                  $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
   /ssl/renew:
     put:
       tags:
         - SSL
-      summary: Renews a SSL Certificate providing id
+      summary: Renews a SSL Certificate
       description: User may Renew SSL Certificate
       operationId: sslRenew
       responses:
@@ -666,7 +727,7 @@ components:
           type: string
           example: file_to_search
       type: object
-	widget:
+    widgets:
       required:
         - userId
         - widgetId
@@ -678,12 +739,12 @@ components:
           type: integer
           example: 12345
       type: object
-	ssl:
+    imageCreateRequest:
       required:
-        - sslId
+        - userId
       properties:
-        sslId:
-          type: string
-          example: cert123456
-      type: object
-		
+        userId:
+         type: "string"
+         example: "abcd12345"
+         description: "userid of user posting image"
+      type: "object"
