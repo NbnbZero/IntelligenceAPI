@@ -27,14 +27,14 @@ tags:
     description: AR Routes
   - name: Cognitive Learning
     description: Cognitive Learning Routes
-  - name: IoT 
+  - name: IoT Dashboard
     description: IoT Routes
   - name: Search
     description: Semantic Search Routes
   - name: SSL
     description: SSL Provisioning Routes
 paths:
-  /conversation/user:
+  /conversation/{userId}:
     get:
       tags:
         - AIML
@@ -62,7 +62,7 @@ paths:
           description: bad input parameter
         "404":
           description: Conversation not found.
-  /conversation/conversation:
+  /conversation/{userId}/{conversationId}:
     get:
       tags:
         - AIML
@@ -90,7 +90,33 @@ paths:
           description: bad input parameter
         "404":
           description: Conversation not found.
-  /conversation/message:
+    delete:
+      tags:
+        - AIML
+      summary: Deletes a conversation thread
+      description: Removes a specified conversation thread
+      operationId: deleteThread
+      responses:
+        "400":
+          description: Invalid conversation Id
+        "404":
+          description: Conversation not found.
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+    put:
+      tags:
+        - AIML
+      summary: Hide conversation thread
+      description: Logged in User may hide a conversation thread.
+      operationId: hideThread
+      responses:
+        "400":
+          description: Invalid conversation id supplied.
+        "404":
+          description: Conversation not found.
+  /conversation/{userId}/{conversationId}/{messageId}:
     get:
       tags:
         - AIML
@@ -117,23 +143,6 @@ paths:
           description: bad input parameter
         "404":
           description: Conversation not found.
-  /conversation/remove:
-    delete:
-      tags:
-        - AIML
-      summary: Deletes a conversation thread
-      description: Removes a specified conversation thread
-      operationId: deleteThread
-      responses:
-        "400":
-          description: Invalid conversation Id
-        "404":
-          description: Conversation not found.
-      security:
-        - user_auth:
-            - "write:conversation"
-            - "read:conversation"
-  /message/remove:
     delete:
       tags:
         - AIML
@@ -149,19 +158,6 @@ paths:
         - user_auth:
             - "write:conversation"
             - "read:conversation"
-  /message/hide:
-    put:
-      tags:
-        - AIML
-      summary: Hide conversation thread
-      description: Logged in User may hide a conversation thread.
-      operationId: hideThread
-      responses:
-        "400":
-          description: Invalid conversation id supplied.
-        "404":
-          description: Conversation not found.
-  /conversation/hide:
     put:
       tags:
         - AIML
@@ -173,7 +169,6 @@ paths:
           description: Invalid message id supplied.
         "404":
           description: Conversation not found.
-  /message/post:
     post:
       tags:
         - AIML
@@ -455,7 +450,7 @@ paths:
             schema:
               $ref: '#/components/schemas/image'
         description: image to post
-  /dashboardWidgets/{userId}:
+  /dashboardWidgets/userId:
     get:
       tags:
         - IoT 
@@ -481,7 +476,7 @@ paths:
                   $ref: '#/components/schemas/widgets'
         '400':
           description: bad input parameter
-  /dashboardWidgets/{widgetId}:
+  /dashboardWidgets/widgetId:
     get:
       tags:
         - IoT 
@@ -509,6 +504,7 @@ paths:
                   $ref: '#/components/schemas/widgets'
         '400':
           description: bad input parameter
+  /dashboardWidget/post:
     post:
       tags:
         - IoT
@@ -526,6 +522,7 @@ paths:
             schema:
               $ref: '#/components/schemas/widgets'
         description: Widget to post
+  /dashboardWidget/update:
     put:
       tags:
         - IoT
@@ -537,6 +534,7 @@ paths:
           description: Invalid Widget supplied.
         "404":
           description: Widget not found.
+  /dashboardWidget/delete:
     delete:
       tags:
         - IoT
