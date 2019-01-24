@@ -739,3 +739,12 @@ components:
          example: "abcd12345"
          description: "userid of user posting image"
       type: "object"
+	  type: object
+	ssl:
+      required:
+        - sslId
+      properties:
+        sslId:
+          type: string
+          example: cert123456
+      type: object
