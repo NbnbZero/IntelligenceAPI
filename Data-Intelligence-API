@@ -459,7 +459,7 @@ paths:
       description: |
         By specifying a UserID, you can retreive their Dashboard Widgets
       parameters:
-        - in: query
+        - in: path
           name: getWidgetsUser
           description: pass an userId to retrieve their Dashboard Widgets
           required: true
@@ -485,7 +485,7 @@ paths:
       description: |
         By specifying a widgetId, you can retreive the Dashboard Widget
       parameters:
-        - in: query
+        - in: path
           name: searchString
           description: pass a widgetId to retrieve the Dashboard Widget
           required: true
@@ -599,7 +599,7 @@ paths:
       description: |
         Provides a SSL Certificate
       parameters:
-        - in: query
+        - in: path
          name: getSSL
           description: providing userId and deviceId revieve the public key/cert
           required: false
@@ -625,7 +625,7 @@ paths:
       description: |
         Renews a SSL Certificate
       parameters:
-        - in: query
+        - in: path
          name: getSSL
           description: Providing the public key/cert, it renews the cert by returing it.
           required: false
