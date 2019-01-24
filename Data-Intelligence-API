@@ -741,9 +741,17 @@ components:
 	  type: object
 	ssl:
       required:
-        - sslId
+        - userId
+		- deviceId
+		- publicKey
       properties:
-        sslId:
+        userId:
           type: string
-          example: cert123456
+          example: user123456
+		deviceId:
+          type: string
+          example: computer123456
+		publicKey:
+          type: string
+          example: 12Ce4tTus
       type: object
