@@ -590,24 +590,24 @@ paths:
               $ref: '#/components/schemas/searchFile'
         description: File to Search
         
-  /ssl/retreive:
+  /ssl/{userId}/{deviceId}:
     get:
       tags:
         - SSL
-      summary: Retrieves a SSL Certificate
+      summary: Retrieves a SSL Certificate, known as the public key
       operationId: retrieveSSL
       description: |
         Provides a SSL Certificate
       parameters:
         - in: query
-         name: searchSSL
-          description: providing SSL id, get the certificate
+         name: getSSL
+          description: providing userId and deviceId revieve the public key/cert
           required: false
           schema:
             type: string
       responses:
         '200':
-          description: search results matching criteria
+          description: 
           content:
             application/json:
               schema:
@@ -616,18 +616,32 @@ paths:
                   $ref: '#/components/schemas/ssl'
         '400':
           description: bad input parameter
-  /ssl/renew:
-    put:
+  /ssl/{publicKey}:
+	get:
       tags:
         - SSL
-      summary: Renews a SSL Certificate
-      description: User may Renew SSL Certificate
-      operationId: sslRenew
+      summary: Renews the SSL Certificate
+      operationId: renewSSL
+      description: |
+        Renews a SSL Certificate
+      parameters:
+        - in: query
+         name: getSSL
+          description: Providing the public key/cert, it renews the cert by returing it.
+          required: false
+          schema:
+            type: string
       responses:
-        "400":
-          description: Invalid SSL supplied.
-        "404":
-          description: SSL Cert not found.
+        '200':
+          description: 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ssl'
+        '400':
+          description: bad input parameter
 components:
   schemas:
     conversation:
