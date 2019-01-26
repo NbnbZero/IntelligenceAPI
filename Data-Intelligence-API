@@ -40,7 +40,7 @@ paths:
         - AIML
       summary: retrieves conversation thread by UserID
       operationId: searchUserID
-      description: |
+      description:
         By specifying a UserID, you can retreive their conversation thread with the ChatBot
       parameters:
         - in: query
@@ -60,6 +60,8 @@ paths:
                   $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
+        "404":
+          description: Conversation not found.
   /conversation/conversation:
     get:
       tags:
@@ -67,29 +69,14 @@ paths:
       summary: retrieves conversation thread by ConversationId
       operationId: searchConversationId
       description: |
-        By specifying a UserID, you can retreive their conversation thread with the ChatBot
+        By specifying a ConversationID, you can retreive their conversation thread with the ChatBot
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -101,35 +88,22 @@ paths:
                   $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
-  /message:
+        "404":
+          description: Conversation not found.
+  /conversation/message:
     get:
       tags:
         - AIML
       summary: retrieves message from conversation
-      operationId: searchUserID
-      description: by specifying a message and conversation Id, it retrieves the message
+      operationId: searchMessageID
+      description: by specifying a message Id, it retrieves the message
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: messageId
+          description: Id of the Message we wish to retreive the Conversation Thread From
+          required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -141,6 +115,8 @@ paths:
                   $ref: '#/components/schemas/conversation'
         '400':
           description: bad input parameter
+        "404":
+          description: Conversation not found.
   /conversation/remove:
     delete:
       tags:
@@ -151,6 +127,8 @@ paths:
       responses:
         "400":
           description: Invalid conversation Id
+        "404":
+          description: Conversation not found.
       security:
         - user_auth:
             - "write:conversation"
@@ -165,6 +143,8 @@ paths:
       responses:
         "400":
           description: Invalid conversation Id
+        "404":
+          description: Conversation not found.
       security:
         - user_auth:
             - "write:conversation"
@@ -192,7 +172,7 @@ paths:
         "400":
           description: Invalid message id supplied.
         "404":
-          description: Message not found.
+          description: Conversation not found.
   /message/post:
     post:
       tags:
@@ -205,26 +185,32 @@ paths:
           description: message created
         '400':
           description: 'invalid input, object invalid'
+        "404":
+          description: Conversation not found.
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/conversation'
         description: message to post
-        
-        
-  /augmentedReality/pullImage:
+  /augmentedReality/{userId}/{imageTag}:
     get:
       tags:
         - AR
-      summary: Retreives an Image Set with Given Tag
+      summary: Retreives an Image Set 
       operationId: retrieveImageSet
       description: |
-        By specifying a Image Tag, an Image Set will return.
+        Retrieve the content of the Image Set for the specified image Tag associated with a specified user.
       parameters:
-        - in: query
-          name: tag
+        - in: path
+          name: imageTag
           description: A tag string used to describe an image.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: A userID to pull image set from
           required: true
           schema:
             type: string
@@ -239,7 +225,199 @@ paths:
                   $ref: '#/components/schemas/imageSet'
         '400':
           description: Bad Input
-  /augmentedReality/pullModel:
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: "User not found"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+    delete:
+      tags:
+        - AR
+      summary: Deletes an Image 
+      description: |
+        Deletes images associated with a specified tag.
+        **Access Policy**: Restricted
+      operationId: deleteImage
+      parameters:
+        - in: path
+          name: imageTag
+          description: The image tag associated with the image set to delete.
+          required: true
+          schema:
+            type: object
+        - in: path
+          name: userId
+          description: the user id of the user removing the image
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: "Success"
+        "400":
+          description: 'Invalid image Id.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "401":
+          description: 'Unauthorized to Delete Image.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "404":
+          description: 'Image Not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "500":
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "503":
+          description: "Image altercations disabled"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
+  /augmentedReality/{userId}/{imageTag}/{index}:
+    get:
+      tags:
+        - AR
+      summary: Retreives an Image at a specified index in an image set
+      operationId: retrieveImageSet
+      description: |
+        Retrieve a specific image from the specified image set associated with a specified tag and user.
+      parameters:
+        - in: path
+          name: imageTag
+          description: A tag string used to describe an image.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: A userID to pull image set from
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: index
+          description: An index of an image to pull from image set
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Returning Image Object and Associated Tag
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/imageSet'
+        '400':
+          description: Bad Input
+        '404':
+          description: "User not found"
+        '500':
+          description: "Server error"
+  /augmentedReality/{userId}/{imageTag}/{imageId}:
+    post:
+      tags:
+        - AR
+      summary: Posts an Image
+      operationId: postImage
+      description: | 
+        Posts an Image to a database with a given Tag.
+        **Access Policy**: Restricted
+      parameters:
+        - in: path
+          name: imageTag
+          description: The Image tag associated to image
+          required: true
+          schema:
+            type: object
+        - in: path
+          name: imageId
+          description: imageId to associate to image posted
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: The ID associated with User Posting the image.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: image
+          description: The Image to Publish
+          required: true
+          schema:
+            type: string
+            format: byte
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/image'
+        '201':
+          description: Image and Tag created
+        '204':
+          description: Request Processed
+        '400':
+          description: 'Invalid input, image invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to Publish image.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/image'
+        description: image to post
+  /augmentedReality/{userId}/{associatedModelTag}:
     get:
       tags:
         - AR
@@ -248,9 +426,15 @@ paths:
       description: |
         By specifying a Tag, an Associated Model will return.
       parameters:
-        - in: query
-          name: tag
+        - in: path
+          name: associatedModelTag
           description: A tag string used to describe an associated model.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: A userID to pull associatedModel from
           required: true
           schema:
             type: string
@@ -265,82 +449,83 @@ paths:
                   $ref: '#/components/schemas/associatedModel'
         '400':
           description: Bad Input.
-          
-  /augmentedReality/publishImage:
-    post:
-      tags:
-        - AR
-      summary: Posts an Image
-      operationId: postImage
-      description: Posts an Image to a database with a given Tag.
-      parameters:
-        - in: path
-          name: image
-          description: The Image to publish
-          required: true
-          schema:
-            type: object
-        - in: path
-          name: tag
-          description: Tag to associate image with
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Image and Tag created
-        '204':
-          description: Request Processed
-        '400':
-          description: 'Invalid input, image object invalid.'
-        '401':
-          description: 'Unauthorized to Publish Image.'
         '404':
-          description: 'Requested Resource not Found.'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/imageSet'
-        description: image to post
-  /augmentedReality/publishModel:
+          description: "User not found"
+        '500':
+          description: "Server error"
     post:
       tags:
         - AR
       summary: Post an Associated Model.
       operationId: postAssociatedModel
-      description: Posts an Associated Model to a Database with a given Tag.
+      description: | 
+        Posts an associatedModel to a database with a given Tag.
+        **Access Policy**: Restricted
       parameters:
         - in: path
-          name: associatedModel
-          description: The Associated Model to publish
+          name: associatedModelTag
+          description: The Associated Model's Tag to to associate with AM
           required: true
           schema:
             type: object
         - in: path
-          name: tag
-          description: Tag to associate Associated Model with
+          name: userId
+          description: user id of user posting model
           required: true
           schema:
             type: string
+        - in: path
+          name: associatedModelId
+          description: id of associated Model
+          required: true
+          schema: 
+            type: string
+        - in: query
+          name: associatedModel
+          description: Associated Model
+          required: true
+          schema: 
+            type: string
+            format: byte
       responses:
         '201':
           description: Associated Model and Tag created
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/associatedModel'
         '204':
           description: Request Processed
         '400':
           description: 'Invalid input, associated model invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '401':
           description: 'Unauthorized to Publish Model.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '404':
           description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/associatedModel'
         description: Associated Model to Post.
-  /augmentedReality/updateModel:
     put:
       tags:
         - AR
@@ -349,24 +534,138 @@ paths:
       operationId: updateAssociatedModel
       parameters:
         - in: path
-          name: associatedModel
-          description: The Associated Model to publish
+          name: associatedModelTag
+          description: The Associated Model Id to publish
           required: true
           schema:
             type: object
+        - in: path
+          name: userId
+          description: The userID of user posting image.
+          required: true
+          schema:
+            type: string
       responses:
+        "200":
+          description: "Success"
         "400":
           description: 'Invalid Associated Model supplied.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         "401":
           description: 'Unauthorized to update model.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         "404":
           description: 'Associated Model not found.'
-  /augmentedReality/removeImage:
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "500":
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "503":
+          description: "Model altercations disabled"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+    delete:
+      tags:
+        - AR
+      summary: Deletes an associated model.
+      description: | 
+        Remove a specified associated model.
+        **Access Policy**: Restricted
+      operationId: deleteAssociatedModel
+      parameters:
+        - in: path
+          name: associatedModelTag
+          description: The associatedModelId tied to the model to delete.
+          required: true
+          schema:
+            type: object
+        - in: path
+          name: userId
+          description: The userID of user posting image.
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: "Success"
+        "400":
+          description: 'Invalid associated model Id.'
+        "401":
+          description: 'Unauthorized to Delete Image.'
+        "404":
+          description: 'Associated Model Not Found.'
+        "500":
+          description: "Server error"
+        "503":
+          description: "Model altercations disabled"
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
+  /augmentedReality/{userId}/{associatedModelTag}/{index}:
+    get:
+      tags:
+        - AR
+      summary: Retreives an Associated Model with Given Tag at a specified index
+      operationId: retrieveAssociatedModel
+      description: |
+        By specifying a Tag, an Associated Model will return.
+      parameters:
+        - in: path
+          name: associatedModelTag
+          description: A tag string used to describe an associated model.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: A userID to pull associatedModel from
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: index
+          description: an index of an associated model
+          required: true
+          schema: 
+            type: integer
+      responses:
+        '200':
+          description: Returning Associated Model and Tag
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/associatedModel'
+        '400':
+          description: Bad Input.
+        '404':
+          description: "User not found"
+        '500':
+          description: "Server error"
+  /augmentedReality/{userId}/{imageId}:
     delete:
       tags:
         - AR
       summary: Deletes an Image 
-      description: Removes a specified image from the Database
+      description: | 
+        Deletes an image from database with a given Tag.
+        **Access Policy**: Restricted
       operationId: deleteImage
       parameters:
         - in: path
@@ -375,90 +674,113 @@ paths:
           required: true
           schema:
             type: object
-      responses:
-        "400":
-          description: "Invalid image Id"
-        "401":
-          description: "Unauthorized to Delete Image"
-        "404":
-          description: "Image not found."
-      security:
-        - user_auth:
-            - "write:image"
-            - "read:image"
-  /augmentedReality/removeModel:
-    delete:
-      tags:
-        - AR
-      summary: Deletes an associated model.
-      description: Removes a specified associated model.
-      operationId: deleteAssociatedModel
-      parameters:
         - in: path
-          name: associatedModelId
-          description: The associatedModelId tied to the model to delete.
+          name: userId
+          description: the user id of the user removing the image
           required: true
           schema:
-            type: object
+            type: string
       responses:
+        "204":
+          description: "Success"
         "400":
-          description: 'Invalid associated model Id.'
+          description: 'Invalid image Id.'
         "401":
           description: 'Unauthorized to Delete Image.'
         "404":
-          description: 'Associated Model Not Found.'
+          description: 'Image Not Found.'
+        "500":
+          description: "Server error"
+        "503":
+          description: "Image altercations disabled"
       security:
         - user_auth:
             - "write:image"
             - "read:image"
-  /image:
+  /image/{userId}/{imageTag}/{imageId}:
     post:
       tags:
         - Cognitive Learning
       summary: posts image 
       operationId: postImage
       description: posts a provided image
+      parameters:
+        - in: path
+          name: imageTag
+          description: The Image tag associated to image
+          required: true
+          schema:
+            type: object
+        - in: path
+          name: imageId
+          description: imageId to associate to image posted
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: The ID associated with User Posting the image.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: image
+          description: The Image to Publish
+          required: true
+          schema:
+            type: string
+            format: byte
       responses:
         '201':
-          description: image created
+          description: Image and Tag created
+        '204':
+          description: Request Processed
         '400':
-          description: 'invalid input, object invalid'
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to Publish image.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/image'
         description: image to post
-  /dashboardWidgets/user:
+        
+  /dashboardWidgets/userId:
     get:
       tags:
-        - IoT Dashboard
+        - IoT 
       summary: retrieves list of Dashboard Widgets
       operationId: widgetsUser
       description: |
         By specifying a UserID, you can retreive their Dashboard Widgets
       parameters:
         - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+          name: getWidgetsUser
+          description: pass an userId to retrieve their Dashboard Widgets
+          required: true
           schema:
             type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -467,13 +789,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schemas/widgets'
         '400':
           description: bad input parameter
-  /dashboardWidgets/widget:
+  /dashboardWidgets/widgetId:
     get:
       tags:
-        - IoT Dashboard
+        - IoT 
       summary: retrieves a Dashboard Widget
       operationId: widgetsId
       description: |
@@ -481,25 +803,12 @@ paths:
       parameters:
         - in: query
           name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: skip
-          description: number of records to skip for pagination
+          description: pass a widgetId to retrieve the Dashboard Widget
+          required: true
           schema:
             type: integer
             format: int32
             minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -508,13 +817,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schemas/widgets'
         '400':
           description: bad input parameter
   /dashboardWidget/post:
     post:
       tags:
-        - Cognitive Learning
+        - IoT
       summary: Posts a Dashboard Widget 
       operationId: postWidget
       description: posts a provided Widget
@@ -527,12 +836,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/conversation'
+              $ref: '#/components/schemas/widgets'
         description: Widget to post
   /dashboardWidget/update:
     put:
       tags:
-        - Cognitive Learning
+        - IoT
       summary: Updates a DashBoard Widget 
       description: User may make changes to current Dashboard Widget
       operationId: updateWidget
@@ -544,7 +853,7 @@ paths:
   /dashboardWidget/delete:
     delete:
       tags:
-        - Cognitive Learning
+        - IoT
       summary: Deletes an Dashboard Widget.
       description: Removes a specified Dashboard Widget.
       operationId: deleteDashboardWidget
@@ -557,48 +866,213 @@ paths:
             - "read:Widget"
   /search:
     get:
-      tags:
-        - Search
-      summary: Performs Semantic Search
-      operationId: search
+      summary: obtains list of documents
+      operationId: getDocuments
+      tags: 
+        - search
       description: |
-        Semantic Search a given file.
+        Obtain associated documents from a given organization.
       parameters:
-        - in: query
-          name: searchFile
-          description: pass the name of a PyText file for searching
+        - name: organization 
+          in: query
+          description: organization to fetch documents from
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: search query
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: query document by name
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: 'search results matching criteria'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+        '404':
+          description: "User not found"
+        '500':
+          description: "Server error"
+        '400':
+          description: bad input parameter
+    post: 
+      summary: upload document
+      operationId: uploadDocument
+      tags:
+        - search
+      parameters:
+        - name: organization 
+          in: query
+          description: organization to upload documents to
+          required: true
+          schema:
+            type: string
+        - name: document
+          in: header
+          description: document to upload
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '201':
+          description: Document created
+        '204':
+          description: No Content
+        '400':
+          description: 'Invalid input, document invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+          
+  /documents/{documentId}:
+    get:
+      summary: obtain specific document
+      operationId: getDocumentById
+      tags:
+        - search
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          description: id of document to retrieve
+          schema:
+            type: string
+        - name: organization 
+          in: query
+          description: organization to fetch documents from
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: return fileID and fileName that are semantically searched
+          description: document matching criteria
           content:
             application/json:
               schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/searchFile'
+                $ref: "#/components/schemas/Document"
         '400':
-          description: bad input parameter
-          
-    post:
+          description: Bad Input.
+        '404':
+          description: "User not found"
+        '500':
+          description: "Server error"
+    put:
+      summary: update document
+      operationId: updateDocument
       tags:
-        - Search
-      summary: Uploads a Document
-      operationId: postDocument
-      description: Uploads a Document containing the Semantic Search Results
+        - search
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          description: id of document to retrieve
+          schema:
+            type: string
+        - name: organization
+          in: path
+          description: organization to fetch documents from
+          required: true
+          schema:
+            type: string
+        - name: document
+          in: query
+          description: document
+          required: true
+          schema:
+            $ref: "#/components/schemas/Document"
       responses:
-        '201':
-          description: Search Finished, Document Uploaded
-        '400':
-          description: 'invalid input, object invalid'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/searchFile'
-        description: File to Search
+        "200":
+          description: "Success"
+        "400":
+          description: 'Invalid document supplied.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "404":
+          description: 'Document not found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        "500":
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+          
+    delete:
+      summary: delete document
+      operationId: deleteDocument
+      tags:
+        - search
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          description: id of document to delete
+          schema:
+            type: string
+        - name: organization
+          in: path
+          description: organization to fetch documents from
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: "Success"
+        "400":
+          description: 'Invalid input parameter or file.'
+        "401":
+          description: 'Unauthorized to Delete document.'
+        "404":
+          description: 'Document Not Found.'
+        "500":
+          description: "Server error"
         
   /ssl/retreive:
     get:
@@ -675,33 +1149,39 @@ components:
       required:
         - modelId
         - modelName
+        - associatedModel
       properties:
         modelId:
           type: string
-          example: model123456
+          example: "123e4567-e89b-12d3-a456-426655440000"
         modelName:
           type: string
           example: Blue Ball
+        associatedModel:
+          type: string
+          format: byte
       type: object
     image:
       required:
+        - image
         - imageId
-        - imageName
         - imageSetId
         - date
       properties:
+        image:
+          type: string
+          format: byte
+          example: Base64
         imageId:
           type: string
-          example: image123456
-        imageName:
-          type: string
-          example: pic_of_dog
+          example: "123e4567-e89b-12d3-a456-426655440000"
         imageSetId:
           type: string
           example: imageSet123456
           description: the image set the image is a part of
         date:
           type: string
+          format: date
           example: 1-23-2020
       type: object
     imageSet:
@@ -711,20 +1191,50 @@ components:
       properties:
         imageSetId:
           type: string
-          example: imageSet123456
+          example: "123e4567-e89b-12d3-a456-426655440000"
         imageSetName:
           type: string
           example: pics_of_animals
       type: object
-    searchFile:
-      required:
-        - searchFileID
-        - searchFileName
-      properties:
-        searchFileID:
-          type: string
-          example: searchFile001
-        searchFileName:
-          type: string
-          example: file_to_search
+    Document:
       type: object
+      required:
+        - name
+        - file
+        - tags
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        name:
+          type: string
+          example: Dog Picture
+        file:
+          type: string
+          format: base64
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["Dog", "Puppy", "Test"]
+          
+    widgets:
+      required:
+        - userId
+        - widgetId
+      properties:
+        userId:
+          type: string
+          example: name123456
+        widgetId:
+          type: integer
+          example: 12345
+      type: object
+    genericErrorResponse:
+      type: "object"
+      properties:
+        err:
+          type: "string"
+          example: "An error has occurred while processing your request."
+          description: "Basic error response."
