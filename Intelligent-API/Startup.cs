@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
-namespace Intelligent_API
+using Intelligent.Data.AzureTables;
+using Intelligent.Data.Cosmos;
+
+namespace Intelligent.API
 {
     public class Startup
     {
@@ -28,9 +24,26 @@ namespace Intelligent_API
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
+        public void ConfigureStorage()
+        {
+            var storageConfig = Configuration.GetSection("AzureCloudStorage");
+            var cosmosConfig = Configuration.GetSection("CosmosDb");
+            CloudTableContext.InitializeContext(
+                storageConfig.GetValue<string>("UserStoreName"),
+                storageConfig.GetValue<string>("UserStoreKey")
+            );
+            CosmosContext.InitializeContext(
+                cosmosConfig.GetValue<string>("Database"),
+                cosmosConfig.GetValue<string>("Endpoint"),
+                cosmosConfig.GetValue<string>("Key")
+            );
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            ConfigureStorage();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
