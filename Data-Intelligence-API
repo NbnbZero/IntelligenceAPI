@@ -27,14 +27,14 @@ tags:
     description: AR Routes
   - name: Cognitive Learning
     description: Cognitive Learning Routes
-  - name: IoT Dashboard
+  - name: IoT 
     description: IoT Routes
   - name: Search
     description: Semantic Search Routes
   - name: SSL
     description: SSL Provisioning Routes
 paths:
-  /conversation/user:
+  /conversation/{userId}:
     get:
       tags:
         - AIML
@@ -43,7 +43,7 @@ paths:
       description:
         By specifying a UserID, you can retreive their conversation thread with the ChatBot
       parameters:
-        - in: query
+        - in: path
           name: userId
           description: Id of the User we wish to retreive the Conversation Thread From
           required: true
@@ -51,7 +51,7 @@ paths:
             type: string
       responses:
         '200':
-          description: search results matching criteria
+          description: 'search results matching criteria'
           content:
             application/json:
               schema:
@@ -59,178 +59,19 @@ paths:
                 items:
                   $ref: '#/components/schemas/conversation'
         '400':
-          description: bad input parameter
-        "404":
-          description: Conversation not found.
-  /conversation/conversation:
-    get:
-      tags:
-        - AIML
-      summary: retrieves conversation thread by ConversationId
-      operationId: searchConversationId
-      description: |
-        By specifying a ConversationID, you can retreive their conversation thread with the ChatBot
-      parameters:
-        - in: query
-          name: conversationId
-          description: Id of the Conversation we wish to retreive the Conversation Thread From
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: search results matching criteria
+          description: 'Invalid input, object invalid.'
           content:
-            application/json:
+            text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/conversation'
-        '400':
-          description: bad input parameter
-        "404":
-          description: Conversation not found.
-  /conversation/message:
-    get:
-      tags:
-        - AIML
-      summary: retrieves message from conversation
-      operationId: searchMessageID
-      description: by specifying a message Id, it retrieves the message
-      parameters:
-        - in: query
-          name: messageId
-          description: Id of the Message we wish to retreive the Conversation Thread From
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: search results matching criteria
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/conversation'
-        '400':
-          description: bad input parameter
-        "404":
-          description: Conversation not found.
-  /conversation/remove:
-    delete:
-      tags:
-        - AIML
-      summary: Deletes a conversation thread
-      description: Removes a specified conversation thread
-      operationId: deleteThread
-      responses:
-        "400":
-          description: Invalid conversation Id
-        "404":
-          description: Conversation not found.
-      security:
-        - user_auth:
-            - "write:conversation"
-            - "read:conversation"
-  /message/remove:
-    delete:
-      tags:
-        - AIML
-      summary: Deletes a message from a Conversation 
-      description: Removes a specified message from a specified thread
-      operationId: deleteMessage
-      responses:
-        "400":
-          description: Invalid conversation Id
-        "404":
-          description: Conversation not found.
-      security:
-        - user_auth:
-            - "write:conversation"
-            - "read:conversation"
-  /message/hide:
-    put:
-      tags:
-        - AIML
-      summary: Hide conversation thread
-      description: Logged in User may hide a conversation thread.
-      operationId: hideThread
-      responses:
-        "400":
-          description: Invalid conversation id supplied.
-        "404":
-          description: Conversation not found.
-  /conversation/hide:
-    put:
-      tags:
-        - AIML
-      summary: Hide message in thread
-      description: Logged in User may hide their message in a thread.
-      operationId: hideThread
-      responses:
-        "400":
-          description: Invalid message id supplied.
-        "404":
-          description: Conversation not found.
-  /message/post:
-    post:
-      tags:
-        - AIML
-      summary: posts message to conversation thread
-      operationId: postMessage
-      description: posts a provided string message to the conversation thread
-      responses:
-        '201':
-          description: message created
-        '400':
-          description: 'invalid input, object invalid'
-        "404":
-          description: Conversation not found.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/conversation'
-        description: message to post
-  /augmentedReality/{userId}/{imageTag}:
-    get:
-      tags:
-        - AR
-      summary: Retreives an Image Set 
-      operationId: retrieveImageSet
-      description: |
-        Retrieve the content of the Image Set for the specified image Tag associated with a specified user.
-      parameters:
-        - in: path
-          name: imageTag
-          description: A tag string used to describe an image.
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: userId
-          description: A userID to pull image set from
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Returning Image Object and Associated Tag
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/imageSet'
-        '400':
-          description: Bad Input
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
         '404':
-          description: "User not found"
+          description: 'Requested Resource not Found.'
           content:
             text/plain:
               schema:
@@ -241,64 +82,474 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
-    delete:
-      tags:
-        - AR
-      summary: Deletes an Image 
-      description: |
-        Deletes images associated with a specified tag.
-        **Access Policy**: Restricted
-      operationId: deleteImage
-      parameters:
-        - in: path
-          name: imageTag
-          description: The image tag associated with the image set to delete.
-          required: true
-          schema:
-            type: object
-        - in: path
-          name: userId
-          description: the user id of the user removing the image
-          required: true
-          schema:
-            type: string
-      responses:
-        "204":
-          description: "Success"
-        "400":
-          description: 'Invalid image Id.'
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/genericErrorResponse'
-        "401":
-          description: 'Unauthorized to Delete Image.'
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/genericErrorResponse'
-        "404":
-          description: 'Image Not Found.'
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/genericErrorResponse'
-        "500":
-          description: "Server error"
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/genericErrorResponse'
-        "503":
-          description: "Image altercations disabled"
+        '415':
+          description: 'File Type Not Allowed'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
       security:
         - user_auth:
-            - "write:image"
-            - "read:image"
+          - "write:conversation"
+          - "read:conversation"
+            
+  /conversation/{userId}/{conversationId}:
+    get:
+      tags:
+        - AIML
+      summary: retrieves conversation thread by ConversationId
+      operationId: searchConversationId
+      description: |
+        By specifying a ConversationID, you can retreive their conversation thread with the ChatBot
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'search results matching criteria'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/conversation'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+          - "write:conversation"
+          - "read:conversation"
+    delete:
+      tags:
+        - AIML
+      summary: Deletes a conversation thread
+      description: Removes a specified conversation thread
+      operationId: deleteThread
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/conversation'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+    put:
+      tags:
+        - AIML
+      summary: Hide conversation thread
+      description: Logged in User may hide a conversation thread.
+      operationId: hideThread
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/conversation'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+  /conversation/{userId}/{conversationId}/{messageId}:
+    get:
+      tags:
+        - AIML
+      summary: retrieves message from conversation
+      operationId: searchMessageID
+      description: by specifying a message Id, it retrieves the message
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: messageId
+          description: Id of the Message we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'search results matching criteria'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/conversation'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+    delete:
+      tags:
+        - AIML
+      summary: Deletes a message from a Conversation 
+      description: Removes a specified message from a specified thread
+      operationId: deleteMessage
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: messageId
+          description: Id of the Message we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/conversation'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+    put:
+      tags:
+        - AIML
+      summary: Hide message in thread
+      description: Logged in User may hide their message in a thread.
+      operationId: hideThread
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: messageId
+          description: Id of the Message we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/conversation'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+    post:
+      tags:
+        - AIML
+      summary: posts message to conversation thread
+      operationId: postMessage
+      description: posts a provided string message to the conversation thread
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the User we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: conversationId
+          description: Id of the Conversation we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: messageId
+          description: Id of the Message we wish to retreive the Conversation Thread From
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/conversation'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:conversation"
+            - "read:conversation"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversation'
+        description: message to post
   /augmentedReality/{userId}/{imageTag}/{index}:
     get:
       tags:
@@ -328,7 +579,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Returning Image Object and Associated Tag
+          description: 'Returning Image Object and Associated Tag'
           content:
             application/json:
               schema:
@@ -336,11 +587,38 @@ paths:
                 items:
                   $ref: '#/components/schemas/imageSet'
         '400':
-          description: Bad Input
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '404':
-          description: "User not found"
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '500':
           description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "read:conversation"
   /augmentedReality/{userId}/{imageTag}/{imageId}:
     post:
       tags:
@@ -378,23 +656,19 @@ paths:
             format: byte
       responses:
         '200':
-          description: OK
+          description: 'OK'
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/image'
-        '201':
-          description: Image and Tag created
-        '204':
-          description: Request Processed
+                $ref: '#/components/schemas/imageSet'
         '400':
-          description: 'Invalid input, image invalid.'
+          description: 'Invalid input, object invalid.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
         '401':
-          description: 'Unauthorized to Publish image.'
+          description: 'Unauthorized to upload.'
           content:
             text/plain:
               schema:
@@ -411,12 +685,22 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/image'
         description: image to post
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
   /augmentedReality/{userId}/{associatedModelTag}:
     get:
       tags:
@@ -440,7 +724,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Returning Associated Model and Tag
+          description: 'Returning Associated Model and Tag'
           content:
             application/json:
               schema:
@@ -448,11 +732,38 @@ paths:
                 items:
                   $ref: '#/components/schemas/associatedModel'
         '400':
-          description: Bad Input.
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '404':
-          description: "User not found"
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '500':
           description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "read:conversation"
     post:
       tags:
         - AR
@@ -488,22 +799,28 @@ paths:
             type: string
             format: byte
       responses:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/associatedModel'
         '201':
-          description: Associated Model and Tag created
+          description: 'Associated Model and Tag created'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/associatedModel'
         '204':
-          description: Request Processed
+          description: 'Request Processed'
         '400':
-          description: 'Invalid input, associated model invalid.'
+          description: 'Invalid input, object invalid.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
         '401':
-          description: 'Unauthorized to Publish Model.'
+          description: 'Unauthorized to upload.'
           content:
             text/plain:
               schema:
@@ -520,12 +837,22 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/associatedModel'
         description: Associated Model to Post.
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
     put:
       tags:
         - AR
@@ -546,38 +873,46 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: "Success"
-        "400":
-          description: 'Invalid Associated Model supplied.'
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/associatedModel'
+        '400':
+          description: 'Invalid input, object invalid.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
-        "401":
-          description: 'Unauthorized to update model.'
+        '401':
+          description: 'Unauthorized to upload.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
-        "404":
-          description: 'Associated Model not found.'
+        '404':
+          description: 'Requested Resource not Found.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
-        "500":
+        '500':
           description: "Server error"
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
-        "503":
-          description: "Model altercations disabled"
+        '415':
+          description: 'File Type Not Allowed'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
     delete:
       tags:
         - AR
@@ -600,18 +935,42 @@ paths:
           schema:
             type: string
       responses:
-        "204":
-          description: "Success"
-        "400":
-          description: 'Invalid associated model Id.'
-        "401":
-          description: 'Unauthorized to Delete Image.'
-        "404":
-          description: 'Associated Model Not Found.'
-        "500":
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/associatedModel'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
           description: "Server error"
-        "503":
-          description: "Model altercations disabled"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
       security:
         - user_auth:
             - "write:image"
@@ -645,7 +1004,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Returning Associated Model and Tag
+          description: 'Returning Associated Model and Tag'
           content:
             application/json:
               schema:
@@ -653,11 +1012,38 @@ paths:
                 items:
                   $ref: '#/components/schemas/associatedModel'
         '400':
-          description: Bad Input.
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '404':
-          description: "User not found"
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '500':
           description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "read:image"
   /augmentedReality/{userId}/{imageId}:
     delete:
       tags:
@@ -681,18 +1067,42 @@ paths:
           schema:
             type: string
       responses:
-        "204":
-          description: "Success"
-        "400":
-          description: 'Invalid image Id.'
-        "401":
-          description: 'Unauthorized to Delete Image.'
-        "404":
-          description: 'Image Not Found.'
-        "500":
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/associatedModel'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
           description: "Server error"
-        "503":
-          description: "Image altercations disabled"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
       security:
         - user_auth:
             - "write:image"
@@ -732,9 +1142,15 @@ paths:
             format: byte
       responses:
         '201':
-          description: Image and Tag created
+          description: 'Image and Tag created'
         '204':
-          description: Request Processed
+          description: 'Request Processed'
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/image'
         '400':
           description: 'Invalid input, object invalid.'
           content:
@@ -742,7 +1158,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
         '401':
-          description: 'Unauthorized to Publish image.'
+          description: 'Unauthorized to upload.'
           content:
             text/plain:
               schema:
@@ -759,6 +1175,16 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
       requestBody:
         content:
           application/json:
@@ -766,7 +1192,7 @@ paths:
               $ref: '#/components/schemas/image'
         description: image to post
         
-  /dashboardWidgets/userId:
+  /dashboardWidgets/{userId}:
     get:
       tags:
         - IoT 
@@ -775,6 +1201,12 @@ paths:
       description: |
         By specifying a UserID, you can retreive their Dashboard Widgets
       parameters:
+        - in: path
+          name: userId
+          description: The ID associated with User retrieving Dashboard Widgets.
+          required: true
+          schema:
+            type: string
         - in: query
           name: getWidgetsUser
           description: pass an userId to retrieve their Dashboard Widgets
@@ -783,7 +1215,7 @@ paths:
             type: string
       responses:
         '200':
-          description: search results matching criteria
+          description: 'search results matching criteria'
           content:
             application/json:
               schema:
@@ -791,8 +1223,40 @@ paths:
                 items:
                   $ref: '#/components/schemas/widgets'
         '400':
-          description: bad input parameter
-  /dashboardWidgets/widgetId:
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
+  /dashboardWidgets/{widgetId}:
     get:
       tags:
         - IoT 
@@ -801,6 +1265,12 @@ paths:
       description: |
         By specifying a widgetId, you can retreive the Dashboard Widget
       parameters:
+        - in: path
+          name: widgetId
+          description: The ID associated with widegts to be retrieved.
+          required: true
+          schema:
+            type: string
         - in: query
           name: searchString
           description: pass a widgetId to retrieve the Dashboard Widget
@@ -820,50 +1290,175 @@ paths:
                   $ref: '#/components/schemas/widgets'
         '400':
           description: bad input parameter
-  /dashboardWidget/post:
     post:
       tags:
         - IoT
       summary: Posts a Dashboard Widget 
       operationId: postWidget
       description: posts a provided Widget
+      parameters:
+      - in: path
+        name: widgetId
+        description: The ID associated with widegts to be retrieved.
+        required: true
+        schema:
+          type: string
       responses:
-        '201':
-          description: Widget created
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/widgets'
         '400':
-          description: 'invalid input, object invalid'
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/widgets'
         description: Widget to post
-  /dashboardWidget/update:
     put:
       tags:
         - IoT
       summary: Updates a DashBoard Widget 
       description: User may make changes to current Dashboard Widget
       operationId: updateWidget
+      parameters:
+      - in: path
+        name: widgetId
+        description: The ID associated with widegts to be retrieved.
+        required: true
+        schema:
+          type: string
       responses:
-        "400":
-          description: Invalid Widget supplied.
-        "404":
-          description: Widget not found.
-  /dashboardWidget/delete:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/widgets'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
     delete:
       tags:
         - IoT
       summary: Deletes an Dashboard Widget.
       description: Removes a specified Dashboard Widget.
       operationId: deleteDashboardWidget
+      parameters:
+      - in: path
+        name: widgetId
+        description: The ID associated with widegts to be retrieved.
+        required: true
+        schema:
+          type: string
       responses:
-        "400":
-          description: Invalid Dashboard Widget Id
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/widgets'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
       security:
         - user_auth:
-            - "write:Widget"
-            - "read:Widget"
+            - "write:image"
+            - "read:image"
+            
   /search:
     get:
       summary: obtains list of documents
@@ -893,50 +1488,13 @@ paths:
             type: string
       responses:
         '200':
-          description: 'search results matching criteria'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Document'
-        '404':
-          description: "User not found"
-        '500':
-          description: "Server error"
-        '400':
-          description: bad input parameter
-    post: 
-      summary: upload document
-      operationId: uploadDocument
-      tags:
-        - search
-      parameters:
-        - name: organization 
-          in: query
-          description: organization to upload documents to
-          required: true
-          schema:
-            type: string
-        - name: document
-          in: header
-          description: document to upload
-          required: true
-          schema:
-            type: object
-      responses:
-        '200':
-          description: OK
+          description: 'OK'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Document'
-        '201':
-          description: Document created
-        '204':
-          description: No Content
         '400':
-          description: 'Invalid input, document invalid.'
+          description: 'Invalid input, object invalid.'
           content:
             text/plain:
               schema:
@@ -965,6 +1523,70 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
+                
+    post: 
+      summary: upload document
+      operationId: uploadDocument
+      tags:
+        - search
+      parameters:
+        - name: organization 
+          in: query
+          description: organization to upload documents to
+          required: true
+          schema:
+            type: string
+        - name: document
+          in: header
+          description: document to upload
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
           
   /documents/{documentId}:
     get:
@@ -987,17 +1609,45 @@ paths:
             type: string
       responses:
         '200':
-          description: document matching criteria
+          description: 'OK'
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: "#/components/schemas/Document"
+                $ref: '#/components/schemas/Document'
         '400':
-          description: Bad Input.
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '404':
-          description: "User not found"
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
         '500':
           description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
     put:
       summary: update document
       operationId: updateDocument
@@ -1023,26 +1673,46 @@ paths:
           schema:
             $ref: "#/components/schemas/Document"
       responses:
-        "200":
-          description: "Success"
-        "400":
-          description: 'Invalid document supplied.'
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: 'Invalid input, object invalid.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
-        "404":
-          description: 'Document not found.'
+        '401':
+          description: 'Unauthorized to upload.'
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
-        "500":
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
           description: "Server error"
           content:
             text/plain:
               schema:
                 $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
           
     delete:
       summary: delete document
@@ -1063,70 +1733,183 @@ paths:
           schema:
             type: string
       responses:
-        "204":
-          description: "Success"
-        "400":
-          description: 'Invalid input parameter or file.'
-        "401":
-          description: 'Unauthorized to Delete document.'
-        "404":
-          description: 'Document Not Found.'
-        "500":
+        '200':
+          description: 'OK'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
           description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
         
-  /ssl/retreive:
+  /ssl/{userId}/{deviceId}:
     get:
       tags:
         - SSL
-      summary: Retrieves a SSL Certificate
+      summary: Retrieves a SSL Certificate, known as the public key
       operationId: retrieveSSL
       description: |
         Provides a SSL Certificate
       parameters:
-        - in: query
-          name: searchString
-          description: pass an optional search string for looking up inventory
-          required: false
+        - in: path
+          name: deviceId
+          description: The ID associated with devices where user retrieves the SSL Certificate.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          description: The ID associated with User retrieving a SSL Certificate.
+          required: true
           schema:
             type: string
         - in: query
-          name: skip
-          description: number of records to skip for pagination
+          name: getSSL
+          description: providing userId and deviceId revieve the public key/cert
+          required: false
           schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
+            type: string
       responses:
         '200':
-          description: search results matching criteria
+          description: 'Returning Image Object and Associated Tag'
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 items:
-                  $ref: '#/components/schemas/conversation'
+                  $ref: '#/components/schemas/ssl'
         '400':
-          description: bad input parameter
-  /ssl/renew:
-    put:
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
+  
+  /ssl/{publicKey}:
+    get:
       tags:
         - SSL
-      summary: Renews a SSL Certificate
-      description: User may Renew SSL Certificate
-      operationId: sslRenew
+      summary: Renews the SSL Certificate
+      operationId: renewSSL
+      description: |
+        Renews a SSL Certificate
+      parameters:
+        - in: path
+          name: publicKey
+          description: The public key used by user to renew the SSL Certificate.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: getSSL
+          description: Providing the public key/cert, it renews the cert by returing it.
+          required: false
+          schema:
+            type: string
       responses:
-        "400":
-          description: Invalid SSL supplied.
-        "404":
-          description: SSL Cert not found.
+        '200':
+          description: 'Returning Image Object and Associated Tag'
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/ssl'
+        '400':
+          description: 'Invalid input, object invalid.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '401':
+          description: 'Unauthorized to upload.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '404':
+          description: 'Requested Resource not Found.'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '500':
+          description: "Server error"
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+        '415':
+          description: 'File Type Not Allowed'
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/genericErrorResponse'
+      security:
+        - user_auth:
+            - "write:image"
+            - "read:image"
+          
 components:
   schemas:
     conversation:
@@ -1218,7 +2001,7 @@ components:
           items:
             type: string
           example: ["Dog", "Puppy", "Test"]
-          
+    
     widgets:
       required:
         - userId
@@ -1231,6 +2014,161 @@ components:
           type: integer
           example: 12345
       type: object
+      
+    Chart:
+      type: object
+      required:
+        - id
+        - userId
+        - chart
+        - payload
+      properties:
+        _id:
+          type: string
+          format: uuid
+          example: '8b8da770-4e45-4d79-8cd8-a31aa82d5822'
+        id:
+          type: integer
+          format: int64
+          example: 42
+        chart:
+          $ref: '#/components/schemas/ChartType'
+        options:
+          $ref: '#/components/schemas/ChartOptions'
+        payload:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartData'
+        userId:
+          type: string
+          example: '00uhzh7xycMLQvbFJ0h7'
+          
+    ChartAnchor:
+      type: string
+      enum:
+        - AUTO
+        - CENTER
+        - CENTER_BOTTOM
+        - CENTER_TOP
+        - LEFT_BOTTOM
+        - LEFT_CENTER
+        - LEFT_TOP
+        - RIGHT_BOTTOM
+        - RIGHT_CENTER
+        - RIGHT_TOP
+        
+    ChartAxis:
+      type: object
+      properties:
+        labels:
+          $ref: '#/components/schemas/ChartLabels'
+        
+    ChartData:
+      type: object
+      required:
+        - label
+        - value
+      properties:
+        label:
+          type: string
+          example: "Dexterity"
+        value:
+          type: array
+          items: {}
+          example: [12.5, "text", 0, 'f']
+          
+    ChartLabels:
+      type: object
+      properties:
+        anchor:
+          $ref: '#/components/schemas/ChartAnchor'
+        fontColor:
+          type: string
+        fontDecoration:
+          $ref: '#/components/schemas/FontDecoration'
+        fontFamily:
+          type: string
+        format:
+          type: string
+        title:
+          type: string
+      
+    ChartLegend:
+      type: object
+      
+    ChartOptions:
+      type: object
+      properties:
+        legend:
+          $ref: '#/components/schemas/ChartLegend'
+        padding:
+          $ref: '#/components/schemas/ChartPadding'
+        tooltop:
+          $ref: '#/components/schemas/ChartTooltip'
+        xAxis:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartAxis'
+        yAxis:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartAxis'
+        xScale:
+          $ref: '#/components/schemas/ChartScaleX'
+        yScale:
+          $ref: '#/components/schemas/ChartScaleY'
+    
+    ChartPadding:
+      type: object
+        
+    ChartScaleX:
+      type: object
+      
+    ChartScaleY:
+      type: object
+        
+    ChartTooltip:
+      type: object
+    
+    ChartType:
+      type: string
+      enum:
+        - BAR
+        - BOX
+        - BUBBLE
+        - COLUMN
+        - HEATMAP
+        - LINE
+        - PIE
+        - RADAR
+        - RANGE
+        - SCATTER
+        - VERTICAL
+      example: 'RADAR'
+      
+    FontDecoration:
+      type: string
+      enum:
+        - BLINK
+        - LINE_THROUGH
+        - NONE
+        - OVERLINE
+        - UNDERLINE 
+    
+    LabelOverlapMode:
+      type: string
+      enum:
+        - ALLOW_OVERLAP
+        - NO_OVERLAP
+    
+    Orientation:
+      type: string
+      enum:
+        - BOTTOM
+        - LEFT
+        - RIGHT
+        - TOP
+    
     genericErrorResponse:
       type: "object"
       properties:
@@ -1238,3 +2176,19 @@ components:
           type: "string"
           example: "An error has occurred while processing your request."
           description: "Basic error response."
+    ssl:
+      required:
+        - userId
+        - deviceId
+        - publicKey
+      properties:
+        userId:
+          type: string
+          example: user123456
+        deviceId:
+          type: string
+          example: computer123456
+        publicKey:
+          type: string
+          example: 12Ce4tTus
+      type: object
