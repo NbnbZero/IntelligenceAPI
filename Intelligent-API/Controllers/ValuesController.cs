@@ -31,7 +31,6 @@ namespace Intelligent.API.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
-            return "1";
         }
 
         // DELETE api/values/5
