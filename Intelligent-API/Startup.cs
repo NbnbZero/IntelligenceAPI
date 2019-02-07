@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Net;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Intelligent.Data.AzureFiles;
 using Intelligent.Data.AzureTables;
 using Intelligent.Data.Cosmos;
 
@@ -22,20 +24,23 @@ namespace Intelligent.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+//            services.AddApiVersioning();
         }
 
         public void ConfigureStorage()
         {
-            var storageConfig = Configuration.GetSection("AzureCloudStorage");
-            var cosmosConfig = Configuration.GetSection("CosmosDb");
+            CloudFileContext.InitializeContext(
+                Configuration["AzureCloudStorage:UserStoreName"],
+                Configuration["AzureCloudStorage:UserStoreKey"]
+            );
             CloudTableContext.InitializeContext(
-                storageConfig.GetValue<string>("UserStoreName"),
-                storageConfig.GetValue<string>("UserStoreKey")
+                Configuration["AzureCloudStorage:UserStoreName"],
+                Configuration["AzureCloudStorage:UserStoreKey"]
             );
             CosmosContext.InitializeContext(
-                cosmosConfig.GetValue<string>("Database"),
-                cosmosConfig.GetValue<string>("Endpoint"),
-                cosmosConfig.GetValue<string>("Key")
+                Configuration["CosmosDb:Database"],
+                Configuration["CosmosDb:Endpoint"],
+                Configuration["CosmosDb:Key"]
             );
         }
 
