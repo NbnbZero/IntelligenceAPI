@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
@@ -22,11 +23,15 @@ namespace Intelligent.Data.Cosmos
             _client = new DocumentClient(
                 new Uri(endpoint),
                 key,
+                new HttpClientHandler()
+                {
+                    ClientCertificateOptions = ClientCertificateOption.Manual,
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+                },
                 new ConnectionPolicy()
                 {
                     EnableEndpointDiscovery = false
-                }
-            );
+                });
             _database = database;
 
             CreateDatabaseIfNotExists(database).Wait();
@@ -55,15 +60,43 @@ namespace Intelligent.Data.Cosmos
             }
         }
 
+        private static async Task CreateCollectionIfNotExistsAsync(string collection)
+        {
+            try
+            {
+                await _client.ReadDocumentCollectionAsync(
+                    documentCollectionUri: UriFactory.CreateDocumentCollectionUri(_database, collection));
+            }
+            catch (DocumentClientException ex)
+            {
+                if (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    await _client.CreateDocumentCollectionAsync(
+                        databaseUri: UriFactory.CreateDatabaseUri(_database),
+                        documentCollection: new DocumentCollection { Id = collection },
+                        options: new RequestOptions { OfferThroughput = 1000 }
+                    );
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
         public static CosmosContext InitializeContext(string database, string endpoint, string key) => Instance ?? (Instance = new CosmosContext(database, endpoint, key));
 
         public async Task<T> GetDocumentAsync<T>(string partition, string id) where T : Document
         {
+            await CreateCollectionIfNotExistsAsync(partition);
+
             try
             {
-                return (T)(dynamic)await _client.ReadDocumentAsync(
+                var res = await _client.ReadDocumentAsync(
                     documentUri: UriFactory.CreateDocumentUri(_database, partition, id)
                 );
+
+                return (T)(dynamic)res.Resource;
             }
             catch (DocumentClientException ex)
             {
@@ -80,6 +113,8 @@ namespace Intelligent.Data.Cosmos
 
         public async Task<IList<T>> GetDocumentsAsync<T>(string partition, Expression<Func<T, bool>> predicate = null)
         {
+            await CreateCollectionIfNotExistsAsync(partition);
+
             IDocumentQuery<T> query;
 
             if (predicate == null)
@@ -107,20 +142,28 @@ namespace Intelligent.Data.Cosmos
 
         public async Task<T> CreateDocumentAsync<T>(T entity, string partition) where T : Document
         {
-            return (T)(dynamic) await _client.CreateDocumentAsync(
+            await CreateCollectionIfNotExistsAsync(partition);
+
+            var res = await _client.CreateDocumentAsync(
                 documentCollectionUri: UriFactory.CreateDocumentCollectionUri(_database, partition),
                 document: entity
             );
+
+            return (T) (dynamic) res.Resource;
         }
 
         public async Task<T> UpdateDocumentAsync<T>(T entity, string partition, string id) where T : Document
         {
-            return (T)(dynamic)await _client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(_database, partition, id), entity);
+            var res = await _client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(_database, partition, id), entity);
+
+            return (T)(dynamic)res.Resource;
         }
 
         public async Task<T> DeleteItemAsync<T>(string id, string partition) where T : Document
         {
-            return (T)(dynamic)await _client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(_database, partition, id));
+            var res = await _client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(_database, partition, id));
+
+            return (T)(dynamic)res.Resource;
         }
     }
 }

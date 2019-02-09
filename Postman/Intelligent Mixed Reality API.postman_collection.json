@@ -1,0 +1,227 @@
+{
+	"info": {
+		"_postman_id": "baaa196c-ad4c-4cf9-8a17-5e6780735c49",
+		"name": "Intelligent Mixed Reality API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Augmented Reality",
+			"item": [
+				{
+					"name": "Get User Uploaded Image",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{https}}/api/augmentedReality/user554/tag/apple/image/748c4508-e0b3-4d46-81a2-b887d6daecbb",
+							"host": [
+								"{{https}}"
+							],
+							"path": [
+								"api",
+								"augmentedReality",
+								"user554",
+								"tag",
+								"apple",
+								"image",
+								"748c4508-e0b3-4d46-81a2-b887d6daecbb"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get User Uploaded Image",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{https}}/api/augmentedReality/user554/tag/apple/image/748c4508-e0b3-4d46-81a2-b887d6daecbb",
+									"host": [
+										"{{https}}"
+									],
+									"path": [
+										"api",
+										"augmentedReality",
+										"user554",
+										"tag",
+										"apple",
+										"image",
+										"748c4508-e0b3-4d46-81a2-b887d6daecbb"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RDpcd29ya3NwYWNlXHNwMTlcRGF0YUludGVsbGlnZW5jZVxJbnRlbGxpZ2VudC1BUElcSW50ZWxsaWdlbnQtQVBJXGFwaVxhdWdtZW50ZWRSZWFsaXR5XHVzZXI1NTRcdGFnXGFwcGxlXGltYWdlXDc0OGM0NTA4LWUwYjMtNGQ0Ni04MWEyLWI4ODdkNmRhZWNiYg==?="
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 07 Feb 2019 04:23:33 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"7c675b86-988f-4f7d-908c-453de99d9fea\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Upload User Image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{https}}/api/augmentedReality/user554/tag/apple",
+							"host": [
+								"{{https}}"
+							],
+							"path": [
+								"api",
+								"augmentedReality",
+								"user554",
+								"tag",
+								"apple"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Upload User Image",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{https}}/api/augmentedReality/user554/tag/apple",
+									"host": [
+										"{{https}}"
+									],
+									"path": [
+										"api",
+										"augmentedReality",
+										"user554",
+										"tag",
+										"apple"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RDpcd29ya3NwYWNlXHNwMTlcRGF0YUludGVsbGlnZW5jZVxJbnRlbGxpZ2VudC1BUElcSW50ZWxsaWdlbnQtQVBJXGFwaVxhdWdtZW50ZWRSZWFsaXR5XHVzZXI1NTRcdGFnXGFwcGxl?="
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 07 Feb 2019 04:22:27 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"9198dc1c-0c1e-4a0b-a8fc-2e06a64c55f6\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Values",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{https}}/api/values",
+					"host": [
+						"{{https}}"
+					],
+					"path": [
+						"api",
+						"values"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"id": "6f4a5c00-2415-4000-9694-14d87f46dd65",
+			"key": "api-version",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"id": "c50f80fd-3648-4497-9ca8-7b718109974a",
+			"key": "https",
+			"value": "https://localhost:44346",
+			"type": "string"
+		}
+	]
+}
