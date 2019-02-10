@@ -21,10 +21,15 @@ namespace Intelligent.API.Controllers
     /// API Controller for all things having to do with Augmented Reality.
     /// </summary>
     /// <see cref="IntelligentMixedRealityController"/>
-//    [ApiVersion("1.0")]                                   // TODO: Un-Comment after applying settings for API versioning
-    [AllowAnonymous]                                        // TODO: Remove for Authentication
-                                                            //    [Route("api/v{version:apiVersion}/cognitiveVision")] // TODO: The versioned API Route
-    [Route("api/cognitiveVision")]                         // TODO: Remove after applying settings for API versioning
+    //    [ApiVersion("1.0")]                                   
+    // TODO: Un-Comment after applying settings for API versioning
+    [AllowAnonymous]                                        
+    // TODO: Remove for Authentication
+                                                            
+    //    [Route("api/v{version:apiVersion}/cognitiveVision")] 
+    // TODO: The versioned API Route
+    [Route("api/cognitiveVision")]                         
+    // TODO: Remove after applying settings for API versioning
     public class CognitiveVisionController : IntelligentMixedRealityController
     {
         /// <summary>Initializes a new instance of the <see cref="CognitiveVisionController"/> class.</summary>
@@ -70,6 +75,14 @@ namespace Intelligent.API.Controllers
             var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
 
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
+            if (!userId.Equals(document.UserId))
+            {
+                return NotFound();
+            }
+            if (!imageTag.Equals(document.ImageTag)) {
+                return NotFound();
+            }
+
             return Ok(new ImageReferenceResponse()
             {
                 ImageId = document.Id,
@@ -104,11 +117,13 @@ namespace Intelligent.API.Controllers
             var upload = tagDir.GetFileReference(request.File.FileName);
 
             // TODO: What happens if a file already exists under the same name?
+            await upload.DeleteIfExistsAsync();
 
             // Upload the image via Stream
             await upload.UploadFromStreamAsync(request.File.OpenReadStream());
 
             // TODO: What happens if the upload fails?
+
 
             // Create an entry in the Cosmos DB Document Database
             var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
