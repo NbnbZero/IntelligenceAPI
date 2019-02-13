@@ -141,7 +141,38 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
-        public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag) => throw new NotImplementedException();
+        [HttpDelete("{userId}/tag/{imageTag}")]
+        public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag)// => throw new NotImplementedException();
+        {
+            // Delete the User's image directory in Cloud File Storage
+            var imgDir = await CloudFileContext.Instance.DeleteUserImageTagSetAsync("testcompany", userId, "img");
+
+            // TODO: What happens if the delete fails?
+
+            // Delete an entry in the Cosmos DB Document Database
+            var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
+            {
+                UserId = userId,
+                FileName = upload.Name, // request.File.FileName,
+                ContentType = request.File.ContentType,
+                Reference = upload.Uri,
+                Metadata = new List<MetaTag>()
+                {
+                    new MetaTag() { Key = "ImageTag", Type = typeof(string).ToString(), Value = imageTag },
+                    new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
+                }
+            }, UploadFileDocument.Partition);
+
+            // Return a response to the Client
+            return Ok(new ImageReferenceResponse()
+            {
+                ImageId = document.Id,
+                ImageTag = imageTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                ImageReference = document.Reference.ToString()
+            });
+        }
 
         /// <summary>
         /// 
