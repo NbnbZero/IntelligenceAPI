@@ -76,6 +76,7 @@ namespace Intelligent.API.Controllers
             var upload = docDir.GetFileReference(request.File.FileName);
 
             // TODO: What happens if a file already exists under the same name?
+            await upload.DeleteIfExistsAsync();
 
             // Upload the image via Stream
             await upload.UploadFromStreamAsync(request.File.OpenReadStream());
