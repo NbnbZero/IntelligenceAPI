@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Intelligent.API.Framework;
+using Intelligent.API.Models;
 using Intelligent.API.Models.Request;
 using Intelligent.API.Models.Response;
 using Intelligent.Data.AzureFiles;
@@ -27,10 +30,14 @@ namespace Intelligent.API.Controllers
     [Route("api/augmentedReality")]                         // TODO: Remove after applying settings for API versioning
     public class AugmentedRealityController : IntelligentMixedRealityController
     {
+
+        private HttpClient _imrClient;
+
         /// <summary>Initializes a new instance of the <see cref="AugmentedRealityController"/> class.</summary>
         /// <param name="logger">The logger instance used to log any messages from this controller.</param>
-        public AugmentedRealityController(ILogger<AugmentedRealityController> logger) : base(logger)
+        public AugmentedRealityController(IHttpClientFactory factory, ILogger<AugmentedRealityController> logger) : base(logger)
         {
+            _imrClient = factory.CreateClient("private-api");
         }
 
         #region Augmented Reality - Images
@@ -66,18 +73,18 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, string imageId)
         {
-            // Query for Upload File Document with ID <c>imageId</c>
-            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Get,
+                $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}");
 
-            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
-            return Ok(new ImageReferenceResponse()
-            {
-                ImageId = document.Id,
-                ImageTag = imageTag,
-                FileName = document.FileName,
-                Metadata = document.Metadata,
-                ImageReference = document.Reference.ToString()
-            });
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+
+            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
 
         /// <summary>
@@ -89,50 +96,29 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpPost("{userId}/tag/{imageTag}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        public async Task<ActionResult<ImageReferenceResponse>> UploadUserImageAsync(string userId, string imageTag, [FromForm]FileUploadRequest request)
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
+        public async Task<ActionResult> UploadUserImageAsync(string userId, string imageTag, [FromForm]FileUploadRequest request)
         {
-            // Get the User's image directory in Cloud File Storage
-            var imgDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "img");
+            // Read the File into a Byte[]
+            byte[] data;
+            using (var br = new BinaryReader(request.File.OpenReadStream()))
+                data = br.ReadBytes((int)request.File.Length);
 
-            // Get the Image Tag specific directory from the image directory
-            var tagDir = imgDir.GetDirectoryReference(imageTag);
-
-            // Create the Image Tag specific directory if it does not exist
-            await tagDir.CreateIfNotExistsAsync();
-
-            // Get/Create a file reference
-            var upload = tagDir.GetFileReference(request.File.FileName);
-
-            // TODO: What happens if a file already exists under the same name?
-
-            // Upload the image via Stream
-            await upload.UploadFromStreamAsync(request.File.OpenReadStream());
-
-            // TODO: What happens if the upload fails?
-
-            // Create an entry in the Cosmos DB Document Database
-            var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Post,
+                $"api/augmentedReality/{userId}/tag/{imageTag}")
             {
-                UserId = userId,
-                FileName = upload.Name, // request.File.FileName,
-                ContentType = request.File.ContentType,
-                Reference = upload.Uri,
-                Metadata = new List<MetaTag>()
-                {
-                    new MetaTag() { Key = "ImageTag", Type = typeof(string).ToString(), Value = imageTag },
-                    new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
-                }
-            }, UploadFileDocument.Partition);
+                Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
+            };
 
-            // Return a response to the Client
-            return Ok(new ImageReferenceResponse()
-            {
-                ImageId = document.Id,
-                ImageTag = imageTag,
-                FileName = document.FileName,
-                Metadata = document.Metadata,
-                ImageReference = document.Reference.ToString()
-            });
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+
+            return BadRequest();
         }
 
         /// <summary>
