@@ -15,4 +15,7 @@
     <Folder Include="Mongo\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Cosmos\Models\EmptyClass.cs" />
+  </ItemGroup>
 </Project>
