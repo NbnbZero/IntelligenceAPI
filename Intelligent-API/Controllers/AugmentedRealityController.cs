@@ -130,34 +130,22 @@ namespace Intelligent.API.Controllers
         [HttpDelete("{userId}/tag/{imageTag}")]
         public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag)// => throw new NotImplementedException();
         {
-            // Delete the User's image directory in Cloud File Storage
-            var imgDir = await CloudFileContext.Instance.DeleteUserImageTagSetAsync("testcompany", userId, "img");
-
-            // TODO: What happens if the delete fails?
-
-            // Delete an entry in the Cosmos DB Document Database
-            var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Delete,
+                $"api/augmentedReality/{userId}/tag/{imageTag}")
             {
-                UserId = userId,
-                FileName = upload.Name, // request.File.FileName,
-                ContentType = request.File.ContentType,
-                Reference = upload.Uri,
-                Metadata = new List<MetaTag>()
-                {
-                    new MetaTag() { Key = "ImageTag", Type = typeof(string).ToString(), Value = imageTag },
-                    new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
-                }
-            }, UploadFileDocument.Partition);
+                // Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
 
-            // Return a response to the Client
-            return Ok(new ImageReferenceResponse()
-            {
-                ImageId = document.Id,
-                ImageTag = imageTag,
-                FileName = document.FileName,
-                Metadata = document.Metadata,
-                ImageReference = document.Reference.ToString()
-            });
+            };
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+
+            return BadRequest();
         }
 
         /// <summary>
