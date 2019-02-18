@@ -9,7 +9,20 @@
 			"name": "Augmented Reality",
 			"item": [
 				{
-					"name": "Get User Uploaded Image",
+					"name": "Get User Image Tag Set",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bad5fd10-622b-4062-a950-1c33f8bb1f7d",
+								"exec": [
+									"pm.variables.set(\"user\", \"user554\");",
+									"pm.variables.set(\"tag\", \"apple\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -18,83 +31,36 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{https}}/api/augmentedReality/user554/tag/apple/image/748c4508-e0b3-4d46-81a2-b887d6daecbb",
+							"raw": "{{azure-dev}}/api/augmentedReality/{{user}}/tag/{{tag}}",
 							"host": [
-								"{{https}}"
+								"{{azure-dev}}"
 							],
 							"path": [
 								"api",
 								"augmentedReality",
-								"user554",
+								"{{user}}",
 								"tag",
-								"apple",
-								"image",
-								"748c4508-e0b3-4d46-81a2-b887d6daecbb"
+								"{{tag}}"
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "Get User Uploaded Image",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{https}}/api/augmentedReality/user554/tag/apple/image/748c4508-e0b3-4d46-81a2-b887d6daecbb",
-									"host": [
-										"{{https}}"
-									],
-									"path": [
-										"api",
-										"augmentedReality",
-										"user554",
-										"tag",
-										"apple",
-										"image",
-										"748c4508-e0b3-4d46-81a2-b887d6daecbb"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Transfer-Encoding",
-									"value": "chunked"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Kestrel"
-								},
-								{
-									"key": "X-SourceFiles",
-									"value": "=?UTF-8?B?RDpcd29ya3NwYWNlXHNwMTlcRGF0YUludGVsbGlnZW5jZVxJbnRlbGxpZ2VudC1BUElcSW50ZWxsaWdlbnQtQVBJXGFwaVxhdWdtZW50ZWRSZWFsaXR5XHVzZXI1NTRcdGFnXGFwcGxlXGltYWdlXDc0OGM0NTA4LWUwYjMtNGQ0Ni04MWEyLWI4ODdkNmRhZWNiYg==?="
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 07 Feb 2019 04:23:33 GMT"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"7c675b86-988f-4f7d-908c-453de99d9fea\"\n}"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Upload User Image",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "3cde530f-59eb-41c5-ba79-accc7564ef60",
+								"exec": [
+									"pm.variables.set(\"user\", \"user554\");",
+									"pm.variables.set(\"tag\", \"apple\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -109,16 +75,16 @@
 							]
 						},
 						"url": {
-							"raw": "{{https}}/api/augmentedReality/user554/tag/apple",
+							"raw": "{{public-dev}}/api/augmentedReality/{{user}}/tag/{{tag}}",
 							"host": [
-								"{{https}}"
+								"{{public-dev}}"
 							],
 							"path": [
 								"api",
 								"augmentedReality",
-								"user554",
+								"{{user}}",
 								"tag",
-								"apple"
+								"{{tag}}"
 							]
 						}
 					},
@@ -184,6 +150,265 @@
 							"body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"9198dc1c-0c1e-4a0b-a8fc-2e06a64c55f6\"\n}"
 						}
 					]
+				},
+				{
+					"name": "Delete User Image Tag Set",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "de65acb2-a0a4-4e1f-96bd-0d2a479519ce",
+								"exec": [
+									"pm.variables.set(\"user\", \"user554\");",
+									"pm.variables.set(\"tag\", \"apple\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{azure-dev}}/api/augmentedReality/{{user}}/tag/{{tag}}",
+							"host": [
+								"{{azure-dev}}"
+							],
+							"path": [
+								"api",
+								"augmentedReality",
+								"{{user}}",
+								"tag",
+								"{{tag}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Uploaded Image by Index",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0d8793a0-c5ca-44ed-b745-e01deddcb64a",
+								"exec": [
+									"pm.variables.set(\"user\", \"user554\");",
+									"pm.variables.set(\"tag\", \"apple\");",
+									"pm.variables.set(\"index\", 1);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{azure-dev}}/api/augmentedReality/{{user}}/tag/{{tag}}/{{index}}",
+							"host": [
+								"{{azure-dev}}"
+							],
+							"path": [
+								"api",
+								"augmentedReality",
+								"{{user}}",
+								"tag",
+								"{{tag}}",
+								"{{index}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Uploaded Image by Identifier",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "245958ec-375a-45fb-93b7-dbc052b7ef5a",
+								"exec": [
+									"pm.variables.set(\"user\", \"user554\");",
+									"pm.variables.set(\"tag\", \"apple\");",
+									"pm.variables.set(\"id\", \"2f4ef279-81e2-420e-9952-d32205fc8ddf\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{azure-dev}}/api/augmentedReality/{{user}}/tag/{{tag}}/image/{{id}}",
+							"host": [
+								"{{azure-dev}}"
+							],
+							"path": [
+								"api",
+								"augmentedReality",
+								"{{user}}",
+								"tag",
+								"{{tag}}",
+								"image",
+								"{{id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get User Uploaded Image",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{https}}/api/augmentedReality/user554/tag/apple/image/748c4508-e0b3-4d46-81a2-b887d6daecbb",
+									"host": [
+										"{{https}}"
+									],
+									"path": [
+										"api",
+										"augmentedReality",
+										"user554",
+										"tag",
+										"apple",
+										"image",
+										"748c4508-e0b3-4d46-81a2-b887d6daecbb"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel"
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RDpcd29ya3NwYWNlXHNwMTlcRGF0YUludGVsbGlnZW5jZVxJbnRlbGxpZ2VudC1BUElcSW50ZWxsaWdlbnQtQVBJXGFwaVxhdWdtZW50ZWRSZWFsaXR5XHVzZXI1NTRcdGFnXGFwcGxlXGltYWdlXDc0OGM0NTA4LWUwYjMtNGQ0Ni04MWEyLWI4ODdkNmRhZWNiYg==?="
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 07 Feb 2019 04:23:33 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"7c675b86-988f-4f7d-908c-453de99d9fea\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update User Uploaded Image by Identifier",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "88928286-a078-40b8-a6de-8fe798d1bee6",
+								"exec": [
+									"pm.variables.set(\"user\", \"user554\");",
+									"pm.variables.set(\"tag\", \"apple\");",
+									"pm.variables.set(\"id\", \"748c4508-e0b3-4d46-81a2-b887d6daecbb\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{azure-dev}}/api/augmentedReality/{{user}}/tag/{{tag}}/image/{{id}}",
+							"host": [
+								"{{azure-dev}}"
+							],
+							"path": [
+								"api",
+								"augmentedReality",
+								"{{user}}",
+								"tag",
+								"{{tag}}",
+								"image",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User Image by Identifier",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d1bedc9c-ef02-4ba6-bf67-02839c163771",
+								"exec": [
+									"pm.variables.set(\"user\", \"user554\");",
+									"pm.variables.set(\"tag\", \"apple\");",
+									"pm.variables.set(\"id\", \"a3947e6c-4197-4dac-bf6d-e68b00ba9d29\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{azure-dev}}/api/augmentedReality/{{user}}/tag/{{tag}}/image/{{id}}",
+							"host": [
+								"{{azure-dev}}"
+							],
+							"path": [
+								"api",
+								"augmentedReality",
+								"{{user}}",
+								"tag",
+								"{{tag}}",
+								"image",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -210,17 +435,51 @@
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e817af14-38dd-4cb1-8a1c-baf94191e7e3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ace0424d-c74f-47db-922a-9f9780323fe9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"id": "6f4a5c00-2415-4000-9694-14d87f46dd65",
+			"id": "747268de-08a0-46c3-a344-739d11e64bf6",
 			"key": "api-version",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "c50f80fd-3648-4497-9ca8-7b718109974a",
-			"key": "https",
-			"value": "https://localhost:44346",
+			"id": "ae1cb4c4-d4fd-436e-9e38-6db02661e6c0",
+			"key": "azure-dev",
+			"value": "https://dev-api-intelligent-mixed-reality.azurewebsites.net",
+			"type": "string"
+		},
+		{
+			"id": "adda50af-19a2-4cf7-a710-1d852441981d",
+			"key": "localhost",
+			"value": "https://localhost:44361",
+			"type": "string"
+		},
+		{
+			"id": "a3522c7c-67c4-416e-940b-c0563f9dd520",
+			"key": "public-dev",
+			"value": "https://intelligentapi.azurewebsites.net",
 			"type": "string"
 		}
 	]
