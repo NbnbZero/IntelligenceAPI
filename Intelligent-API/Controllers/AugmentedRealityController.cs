@@ -42,7 +42,20 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpGet("{userId}/tag/{imageTag}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string imageTag) => throw new NotImplementedException();
+        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string imageTag)
+        {
+            // Query for Upload File Document with ID <c>imageId</c>
+            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
+
+            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
+            return Ok(new ImageReferenceResponse()
+            {
+                ImageTag = imageTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                ImageReference = document.Reference.ToString()
+            });
+        }
 
         /// <summary>
         /// Gets a reference to user's stored image by <paramref name="imageTag"/> and <paramref name="index"/>.
@@ -51,10 +64,13 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <param name="index">The non-zero based index of the image in the tag set.</param>
         /// <returns></returns>
+        /// sophie
         [HttpGet("{userId}/tag/{imageTag}/{index}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, int index) => throw new NotImplementedException();
-
+        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, int index)
+        {
+            
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -141,7 +157,26 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
-        public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag) => throw new NotImplementedException();
+        [HttpDelete("{userId}/tag/{imageTag}")]
+        public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag)// => throw new NotImplementedException();
+        {
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Delete,
+                $"api/augmentedReality/{userId}/tag/{imageTag}")
+            {
+                // Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
+
+            };
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+
+            return BadRequest();
+        }
 
         /// <summary>
         /// 
@@ -150,7 +185,28 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="imageId"></param>
         /// <returns></returns>
-        public async Task<ActionResult<ImageReferenceResponse>> DeleteUserImageAsync(string userId, string imageTag, string imageId) => throw new NotImplementedException();
+        [HttpDelete("{userId}/tag/{imageTag}/image/{imageId}")]
+        public async Task<ActionResult<ImageReferenceResponse>> DeleteUserImageAsync(string userId, string imageTag, string imageId)
+        {
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Delete,
+                $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}")
+            {
+                // Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
+
+            };
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+
+            return BadRequest();
+
+        }
+
         #endregion
 
         #region Augmented Reality - Models
@@ -169,7 +225,22 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, int index) => throw new NotImplementedException();
+        [HttpGet("{userId}/tag/{imageTag}/index/{index}")]
+        public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, int index)
+        {
+            // Query for Upload File Document with ID <c>imageId</c>
+            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
+
+            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
+            return Ok(new ImageReferenceResponse()
+            {
+                ImageTag = imageTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                ImageReference = document.Reference.ToString()
+            });
+
+        }
 
         /// <summary>
         /// 
@@ -186,7 +257,58 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
-        public async Task<object> UploadTagAssociatedModelAsync(string userId, string imageTag) => throw new NotImplementedException();
+        [HttpPost("{userId}/tag/{imageTag}")]
+        public async Task<object> UploadTagAssociatedModelAsync(string userId, string imageTag)
+        {
+            // Get the User's image directory in Cloud File Storage
+            var imgDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "img");
+
+            // Get the Image Tag specific directory from the image directory
+            var tagDir = imgDir.GetDirectoryReference(imageTag);
+
+            // Create the Image Tag specific directory if it does not exist
+            await tagDir.CreateIfNotExistsAsync();
+
+            // Get/Create a file reference
+            var upload = tagDir.GetFileReference(request.File.FileName);
+
+            // TODO: What happens if a file already exists under the same name?
+
+            // Upload the image via Stream
+            await upload.UploadFromStreamAsync(request.File.OpenReadStream());
+
+            // TODO: What happens if the upload fails?
+
+            // Create an entry in the Cosmos DB Document Database
+            var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
+            {
+                UserId = userId,
+                FileName = upload.Name, // request.File.FileName,
+                ContentType = request.File.ContentType,
+                Reference = upload.Uri,
+                Metadata = new List<MetaTag>()
+                {
+                    new MetaTag() { Key = "ImageTag", Type = typeof(string).ToString(), Value = imageTag },
+                    new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
+                }
+            }, UploadFileDocument.Partition);
+
+            // Return a response to the Client
+            return Ok(new ImageReferenceResponse()
+            {
+                ImageId = document.Id,
+                ImageTag = imageTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                ImageReference = document.Reference.ToString()
+            });
+
+
+
+        }
+
+
+
 
         /// <summary>
         /// 
