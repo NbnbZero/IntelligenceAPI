@@ -64,7 +64,6 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <param name="index">The non-zero based index of the image in the tag set.</param>
         /// <returns></returns>
-        /// sophie
         [HttpGet("{userId}/tag/{imageTag}/{index}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, int index)
