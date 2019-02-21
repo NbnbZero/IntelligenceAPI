@@ -11,7 +11,7 @@ using Intelligent.Data.Cosmos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
+//TODO: Add usings for vuforia services
 using Intelligent.Data.Cosmos.Models;
 using Intelligent.Data.Generic;
 
@@ -48,6 +48,17 @@ namespace Intelligent.API.Controllers
             var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
 
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
+            //Document should contain parameters that match the variables -- access and compare through `document`
+            //info may be in the metadata -- check postman
+            if(document.imageTag != imageTag){
+                //return response for bad parameters
+                return BadRequest();
+            }
+            if(document.userId != userId){
+                //return response for bad authetication
+                return BadRequest();
+            }
+
             return Ok(new ImageReferenceResponse()
             {
                 ImageTag = imageTag,
@@ -68,7 +79,28 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, int index)
         {
-            
+            // Query for Upload File Document with ID <c>imageId</c>
+            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
+
+            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
+            //Document should contain parameters that match the variables -- access and compare through `document`
+            //info may be in the metadata -- check postman
+            if(document.imageTag != imageTag){
+                //return response for bad parameters
+                return BadRequest();
+            }
+            if(document.userId != userId){
+                //return response for bad authetication
+                return BadRequest();
+            }
+            return Ok(new ImageReferenceResponse()
+            {
+                Index = document.index,
+                ImageTag = imageTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                ImageReference = document.Reference.ToString()
+            });
         }
         /// <summary>
         /// 
@@ -231,6 +263,19 @@ namespace Intelligent.API.Controllers
             var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
 
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
+            //Document should contain parameters that match the variables -- access and compare through `document`
+            //info may be in the metadata -- check postman
+            if(document.imageTag != imageTag){
+                //return response for bad parameters
+                return BadRequest();
+            }
+            if(document.userId != userId){
+                //return response for bad authetication
+                return BadRequest();
+            }
+            if(document.index != index){
+                return BadRequst();
+            }
             return Ok(new ImageReferenceResponse()
             {
                 ImageTag = imageTag,
@@ -327,7 +372,25 @@ namespace Intelligent.API.Controllers
         #endregion
 
         #region Augmented Reality - Vuforia
-        // TODO: Here is where the Vuforia routes should go
+        
+        //public async Task<object> Summary(string targetId)
+        //{ 
+            //Server Keys
+            //private string accessKey = "server access key";
+            //private string secretKey = "server secret key";
+	
+	        //Database url
+            //private string url = "vuforia url here";
+
+            //private void getSummaryReport() throws URISyntaxException, ClientProtocolException, IOException {
+
+            //}}
+            //return BadRequest();
+        //};   
+
+        
+
+	
         #endregion
     }
 }
