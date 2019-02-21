@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Intelligent.API.Framework;
 using Intelligent.API.Models.Request;
@@ -26,7 +30,7 @@ namespace Intelligent.API.Controllers
     /// <see cref="IntelligentMixedRealityController"/>
 //    [ApiVersion("1.0")]                                   // TODO: Un-Comment after applying settings for API versioning
     [AllowAnonymous]                                        // TODO: Remove for Authentication
-//    [Route("api/v{version:apiVersion}/augmentedReality")] // TODO: The versioned API Route
+                                                            //    [Route("api/v{version:apiVersion}/augmentedReality")] // TODO: The versioned API Route
     [Route("api/aimlChatbot")]                         // TODO: Remove after applying settings for API versioning
     public class AIMLChatbotController : IntelligentMixedRealityController
     {
@@ -194,7 +198,21 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpDelete("conversation/{userId}/{conversationId}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        public async Task<object> DeleteUserConversationAsync(string userId, string conversationId) => throw new NotImplementedException();
+        public async Task<object> DeleteUserConversationAsync(string userId, string conversationId) //=> throw new NotImplementedException();
+        {
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Delete,
+                $"api/AIMLChatbot/{userId}/{conversationId}");
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+
+            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+        }
 
         /// <summary>
         /// 
@@ -214,7 +232,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpDelete("conversation/{userId}/{conversationId}/{messageId}")]
         public async Task<object> DeleteMessageAsync(string userId, string conversationId, string messageId) => throw new NotImplementedException();
-        
+
         /// <summary>
         /// 
         /// </summary>
