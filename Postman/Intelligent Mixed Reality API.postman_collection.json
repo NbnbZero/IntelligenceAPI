@@ -523,6 +523,154 @@
       ]
     },
     {
+      "name": "Semantic Search",
+      "item": [
+        {
+          "name": "Get User document",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "bad5fd10-622b-4062-a950-1c33f8bb1f7d",
+                "exec": [
+                  "pm.variables.set(\"user\", \"user554\");",
+                  "pm.variables.set(\"tag\", \"777\");"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{azure-dev}}/api/semanticSearch/{{user}}/tag/{{Id}}",
+              "host": [
+                "{{azure-dev}}"
+              ],
+              "path": [
+                "api",
+                "semanticSearch",
+                "{{user}}",
+                "tag",
+                "{{Id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload User Image",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "3cde530f-59eb-41c5-ba79-accc7564ef60",
+                "exec": [
+                  "pm.variables.set(\"user\", \"user554\");",
+                  "pm.variables.set(\"tag\", \"777\");"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{public-dev}}/api/semanticSearch/{{user}}/tag/{{Id}}",
+              "host": [
+                "{{public-dev}}"
+              ],
+              "path": [
+                "api",
+                "semanticSearch",
+                "{{user}}",
+                "tag",
+                "{{Id}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Upload User Image",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{https}}/api/semanticSearch/user554/tag/777",
+                  "host": [
+                    "{{https}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cognitiveVision",
+                    "user554",
+                    "tag",
+                    "777"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "X-SourceFiles",
+                  "value": "=?UTF-8?B?RDpcd29ya3NwYWNlXHNwMTlcRGF0YUludGVsbGlnZW5jZVxJbnRlbGxpZ2VudC1BUElcSW50ZWxsaWdlbnQtQVBJXGFwaVxhdWdtZW50ZWRSZWFsaXR5XHVzZXI1NTRcdGFnXGFwcGxl?="
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "ASP.NET"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 07 Feb 2019 04:22:27 GMT"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"9198dc1c-0c1e-4a0b-a8fc-2e06a64c55f6\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Values",
       "request": {
         "method": "GET",
@@ -589,7 +737,7 @@
       {
         "id": "a3522c7c-67c4-416e-940b-c0563f9dd520",
         "key": "public-dev",
-        "value": "https://intelligentapi.azurewebsites.net",
+        "value": "https://intelligenceapi.azurewebsites.net",
         "type": "string"
       }
     ]
