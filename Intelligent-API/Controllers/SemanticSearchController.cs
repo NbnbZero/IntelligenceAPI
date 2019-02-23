@@ -40,7 +40,7 @@ namespace Intelligent.API.Controllers
         /// <param name="documents">The requested documents list.</param>
         /// <param name="documentId">The document's Id.</param>
         /// <returns></returns>
-        [HttpGet("documents/{documentId}")]
+        [HttpGet("{userId}/tag/{documentId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string documents, string documentId)
         {
@@ -86,7 +86,7 @@ namespace Intelligent.API.Controllers
             // Create an entry in the Cosmos DB Document Database
             var doc = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
             {
-                DocumentId = documentId,
+                //DocumentId = documentId,
                 FileName = upload.Name, // request.File.FileName,
                 ContentType = request.File.ContentType,
                 Reference = upload.Uri,
