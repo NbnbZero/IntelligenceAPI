@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -77,9 +77,6 @@ namespace Intelligent.API.Controllers
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
             if (!userId.Equals(document.UserId))
             {
-                return NotFound();
-            }
-            if (!imageTag.Equals(document.ImageTag)) {
                 return NotFound();
             }
 
