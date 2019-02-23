@@ -42,19 +42,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpGet("{userId}/tag/{documentId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
-        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string documents, string documentId)
-        {
-            // Query for Search File Document with ID <c>documentId</c>
-            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, documentId);
-
-            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
-            return Ok(new DocumentReferenceResponse()
-            {
-                DocumentId = document.Id,
-                Metadata = document.Metadata,
-                DocumentReference = document.Reference.ToString()
-            });
-        }
+        public async Task<ActionResult<IList<DocumentReferenceResponse>>> GetUserDocumentTagSetAsync(string userId, string documentId) => throw new NotImplementedException();
 
         /// <summary>
         /// 
