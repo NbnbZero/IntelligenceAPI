@@ -60,7 +60,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpGet("{userId}/tag/{documentId}/{index}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string documentId int index) => throw new NotImplementedException();
+        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string documentId, int index) => throw new NotImplementedException();
 
         /// <summary>
         /// 
