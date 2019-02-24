@@ -156,7 +156,7 @@ namespace Intelligent.API.Controllers
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Delete,
-                $"api/augmentedReality/{userId}/tag/{documentTag}")
+                $"api/semanticSearch/{userId}/tag/{documentTag}")
             {
                 // Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
 
