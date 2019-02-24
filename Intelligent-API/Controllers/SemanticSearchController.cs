@@ -75,7 +75,7 @@ namespace Intelligent.API.Controllers
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/augmentedReality/{userId}/tag/{documentTag}/document/{documentId}");
+                $"api/semanticSearch/{userId}/tag/{documentTag}/document/{documentId}");
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
