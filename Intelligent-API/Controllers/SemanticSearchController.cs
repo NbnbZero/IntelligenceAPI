@@ -73,18 +73,23 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string documentTag, string documentId)
         {
-            // Instantiate the request
-            var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/semanticSearch/{userId}/tag/{documentTag}/document/{documentId}");
+            // Query for Upload File Document with ID <c>imageId</c>
+            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, documentId);
 
-            // Send the request via HttpClient received through Dependency Injection
-            var resp = await _imrClient.SendAsync(req);
+            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
+            if (!userId.Equals(document.UserId))
+            {
+                return NotFound();
+            }
 
-            // TODO: Handle responses based on the response code from the Private API
-            if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
-
-            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+            return Ok(new ImageReferenceResponse()
+            {
+                ImageId = document.Id,
+                ImageTag = documentTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                ImageReference = document.Reference.ToString()
+            });
         }
 
         /// <summary>
