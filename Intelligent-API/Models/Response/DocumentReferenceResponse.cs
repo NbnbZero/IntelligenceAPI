@@ -14,7 +14,7 @@ namespace Intelligent.API.Models.Response
         public string DocumentId { get; set; }
 
         [JsonProperty("tag")]
-        public string ImageTag { get; set; }
+        public string DocumentTag { get; set; }
 
         [JsonProperty("fileName")]
         public string FileName { get; set; }

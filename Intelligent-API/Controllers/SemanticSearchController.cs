@@ -48,8 +48,8 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <returns></returns>
         [HttpGet("{userId}/tag/{documentTag}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string documentTag) => throw new NotImplementedException();
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<DocumentReferenceResponse>))]
+        public async Task<ActionResult<IList<DocumentReferenceResponse>>> GetUserImageTagSetAsync(string userId, string documentTag) => throw new NotImplementedException();
 
         /// <summary>
         /// Gets a reference to user's stored image by <paramref name="imageTag"/> and <paramref name="index"/>.
@@ -59,8 +59,8 @@ namespace Intelligent.API.Controllers
         /// <param name="index">The non-zero based index of the image in the tag set.</param>
         /// <returns></returns>
         [HttpGet("{userId}/tag/{documentTag}/{index}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string documentTag, int index) => throw new NotImplementedException();
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string userId, string documentTag, int index) => throw new NotImplementedException();
 
         /// <summary>
         /// 
@@ -70,8 +70,8 @@ namespace Intelligent.API.Controllers
         /// <param name="imageId">The requested Image's ID.</param>
         /// <returns></returns>
         [HttpGet("{userId}/tag/{documentTag}/document/{documentId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string documentTag, string documentId)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string userId, string documentTag, string documentId)
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
@@ -82,7 +82,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
@@ -96,14 +96,14 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpPost("{userId}/tag/{documentTag}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> UploadUserImageAsync(string userId, string documentTag, [FromForm]FileUploadRequest request)
         {
             // Get the User's image directory in Cloud File Storage
-            var imgDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "img");
+            var docDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "doc");
 
             // Get the Image Tag specific directory from the image directory
-            var tagDir = imgDir.GetDirectoryReference(documentTag);
+            var tagDir = docDir.GetDirectoryReference(documentTag);
 
             // Create the Image Tag specific directory if it does not exist
             await tagDir.CreateIfNotExistsAsync();
@@ -135,13 +135,13 @@ namespace Intelligent.API.Controllers
             }, UploadFileDocument.Partition);
 
             // Return a response to the Client
-            return Ok(new ImageReferenceResponse()
+            return Ok(new DocumentReferenceResponse()
             {
-                ImageId = document.Id,
-                ImageTag = documentTag,
+                DocumentId = document.DocumentId,
+                DocumentTag = documentTag,
                 FileName = document.FileName,
                 Metadata = document.Metadata,
-                ImageReference = document.Reference.ToString()
+                DocumentReference = document.Reference.ToString()
             });
         }
 
@@ -167,7 +167,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest();
         }
@@ -179,7 +179,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="imageId"></param>
         /// <returns></returns>
-        public async Task<ActionResult<ImageReferenceResponse>> DeleteUserImageAsync(string userId, string documentTag, string documentId) => throw new NotImplementedException();
+        public async Task<ActionResult<DocumentReferenceResponse>> DeleteUserImageAsync(string userId, string documentTag, string documentId) => throw new NotImplementedException();
         #endregion
 
         #region Semantic Search - Vuforia
