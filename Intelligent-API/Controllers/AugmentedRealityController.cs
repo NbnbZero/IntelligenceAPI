@@ -27,10 +27,13 @@ namespace Intelligent.API.Controllers
     [Route("api/augmentedReality")]                         // TODO: Remove after applying settings for API versioning
     public class AugmentedRealityController : IntelligentMixedRealityController
     {
+        private HttpClient _imrClient;
+
         /// <summary>Initializes a new instance of the <see cref="AugmentedRealityController"/> class.</summary>
         /// <param name="logger">The logger instance used to log any messages from this controller.</param>
         public AugmentedRealityController(ILogger<AugmentedRealityController> logger) : base(logger)
         {
+            _imrClient = factory.CreateClient("private-api");
         }
 
         #region Augmented Reality - Images
@@ -40,9 +43,10 @@ namespace Intelligent.API.Controllers
         /// <param name="userId">The User's ID.</param>
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <returns></returns>
+        /// Ben Method
         [HttpGet("{userId}/tag/{imageTag}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string imageTag)
+        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string imageTag, string imageId)
         {
             // Query for Upload File Document with ID <c>imageId</c>
             var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
@@ -75,6 +79,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <param name="index">The non-zero based index of the image in the tag set.</param>
         /// <returns></returns>
+        /// sophie
         [HttpGet("{userId}/tag/{imageTag}/{index}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, int index)
@@ -109,6 +114,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <param name="imageId">The requested Image's ID.</param>
         /// <returns></returns>
+        /// implemented
         [HttpGet("{userId}/tag/{imageTag}/image/{imageId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, string imageId)
@@ -134,6 +140,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="request"></param>
         /// <returns></returns>
+        /// implemented
         [HttpPost("{userId}/tag/{imageTag}")]
         [Consumes(MimeTypes.Misc.FormData)]
         public async Task<ActionResult<ImageReferenceResponse>> UploadUserImageAsync(string userId, string imageTag, [FromForm]FileUploadRequest request)
@@ -188,6 +195,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        /// implemented
         [HttpDelete("{userId}/tag/{imageTag}")]
         public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag)// => throw new NotImplementedException();
         {
@@ -216,6 +224,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="imageId"></param>
         /// <returns></returns>
+        /// ben
         [HttpDelete("{userId}/tag/{imageTag}/image/{imageId}")]
         public async Task<ActionResult<ImageReferenceResponse>> DeleteUserImageAsync(string userId, string imageTag, string imageId)
         {
@@ -247,6 +256,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        /// sophie
         public async Task<object> GetTagAssociatedModelsAsync(string userId, string imageTag) => throw new NotImplementedException();
 
         /// <summary>
@@ -256,6 +266,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="index"></param>
         /// <returns></returns>
+        /// ben
         [HttpGet("{userId}/tag/{imageTag}/index/{index}")]
         public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, int index)
         {
@@ -293,6 +304,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="modelId"></param>
         /// <returns></returns>
+        /// sophie
         public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, string modelId) => throw new NotImplementedException();
 
         /// <summary>
@@ -301,8 +313,9 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        /// ben
         [HttpPost("{userId}/tag/{imageTag}")]
-        public async Task<object> UploadTagAssociatedModelAsync(string userId, string imageTag)
+        public async Task<object> UploadTagAssociatedModelAsync(string userId, string imageTag,[FromForm]FileUploadRequest request)
         {
             // Get the User's image directory in Cloud File Storage
             var imgDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "img");
@@ -316,12 +329,30 @@ namespace Intelligent.API.Controllers
             // Get/Create a file reference
             var upload = tagDir.GetFileReference(request.File.FileName);
 
-            // TODO: What happens if a file already exists under the same name?
-
+            //Check to see if File exists under the same name already.
+            try
+            {
+                var fileExists = upload.Exists();
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e);
+                System.Console.WriteLine("File already exists under the specified name.");
+                throw;
+            }
             // Upload the image via Stream
-            await upload.UploadFromStreamAsync(request.File.OpenReadStream());
-
-            // TODO: What happens if the upload fails?
+            // Check to see if upload fails.
+            try
+            {
+                await upload.UploadFromStreamAsync(request.File.OpenReadStream());
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e);
+                System.Console.WriteLine("File upload failed.");
+                throw;
+            }
+            
 
             // Create an entry in the Cosmos DB Document Database
             var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
@@ -360,6 +391,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        /// sophie
         public async Task<object> UpdateTagAssociatedModelAsync(string userId, string imageTag) => throw new NotImplementedException();
 
         /// <summary>
@@ -368,6 +400,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        /// sophie
         public async Task<object> DeleteTagAssociatedModelAsync(string userId, string imageTag) => throw new NotImplementedException();
         #endregion
 

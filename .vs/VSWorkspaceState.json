@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Intelligent-API",
+    "\\Intelligent-API\\Controllers",
+    "\\Intelligent.Data",
+    "\\Postman"
   ],
-  "SelectedNode": "\\.gitignore",
+  "SelectedNode": "\\Intelligent-API\\Controllers\\AugmentedRealityController.cs",
   "PreviewInSolutionExplorer": false
 }
