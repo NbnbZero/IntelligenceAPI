@@ -27,7 +27,7 @@ namespace Intelligent.API.Controllers
 //    [ApiVersion("1.0")]                                   // TODO: Un-Comment after applying settings for API versioning
     [AllowAnonymous]                                        // TODO: Remove for Authentication
 //    [Route("api/v{version:apiVersion}/augmentedReality")] // TODO: The versioned API Route
-    [Route("api/aimlChatbot")]                         // TODO: Remove after applying settings for API versioning
+    [Route("api/AIMLChatbot")]                         // TODO: Remove after applying settings for API versioning
     public class AIMLChatbotController : IntelligentMixedRealityController
     {
 
@@ -52,13 +52,13 @@ namespace Intelligent.API.Controllers
         /// </summary>
         /// <param name="userId">The User's ID.</param>
         /// <returns></returns>
-        [HttpGet("conversation/{userId}")]
+        [HttpGet("conversation/userId")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<object> GetUserAsync(string userId, string imageTag)
+        public async Task<object> GetUserAsync(string userId, string conversationTag)
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/AIMLChatbot/{userId}");
+                $"api/AIMLChatbot/conversationTag/userId");
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
