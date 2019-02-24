@@ -7,6 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Intelligent.API.Framework;
 using Intelligent.API.Models.Request;
 using Intelligent.API.Models.Response;
@@ -31,26 +36,21 @@ namespace Intelligent.API.Controllers
 //    [ApiVersion("1.0")]                                   // TODO: Un-Comment after applying settings for API versioning
     [AllowAnonymous]                                        // TODO: Remove for Authentication
                                                             //    [Route("api/v{version:apiVersion}/augmentedReality")] // TODO: The versioned API Route
-    [Route("api/aimlChatbot")]                         // TODO: Remove after applying settings for API versioning
+    [Route("api/AIMLChatbot")]                         // TODO: Remove after applying settings for API versioning
     public class AIMLChatbotController : IntelligentMixedRealityController
     {
 
         private HttpClient _imrClient;
 
-        /// <summary>Initializes a new instance of the <see cref="AugmentedRealityController"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="AIMLChatbotController"/> class.</summary>
         /// <param name="logger">The logger instance used to log any messages from this controller.</param>
-        public AIMLChatbotController(IHttpClientFactory factory, ILogger<AugmentedRealityController> logger) : base(logger)
+        public AIMLChatbotController(IHttpClientFactory factory, ILogger<AIMLChatbotController> logger) : base(logger)
         {
             _imrClient = factory.CreateClient("private-api");
         }
-        /// <summary>Initializes a new instance of the <see cref="AIMLChatbotController"/> class.</summary>
-        /// <param name="logger">The logger instance used to log any messages from this controller.</param>
-        public AIMLChatbotController(ILogger<AIMLChatbotController> logger) : base(logger)
-        {
-
-        }
-
+        
         #region AIML Chatbot - Messaging
+
         /// <summary>
         /// Gets a reference to all of a user's info
         /// </summary>
@@ -58,11 +58,11 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpGet("conversation/{userId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<object> GetUserAsync(string userId, string imageTag)
+        public async Task<object> GetUserAsync(string userId, string conversationTag)
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/AIMLChatbot/{userId}");
+                $"api/AIMLChatbot/conversation/{userId}");
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
@@ -88,7 +88,7 @@ namespace Intelligent.API.Controllers
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/AIMLChatbot/{userId}/{conversationId}");
+                $"api/AIMLChatbot/conversation/{userId}/{conversationId}");
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
@@ -113,7 +113,7 @@ namespace Intelligent.API.Controllers
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/AIMLChatbot/{userId}/{conversationId}/{messageId}");
+                $"api/AIMLChatbot/conversation/{userId}/{conversationId}/{messageId}");
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
@@ -132,8 +132,9 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId">The conversation ID.</param>
         /// <returns></returns>
         [HttpPost("conversation/{userId}/{conversationId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<object> PostUserConversationAsync(string userId, string conversationId, string messageId, [FromForm]FileUploadRequest request)
+        [Consumes(MimeTypes.Misc.FormData)]
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
+        public async Task<ActionResult> PostUserConversationAsync(string userId, string conversationId, [FromForm]FileUploadRequest request)
         {
             // Read the File into a Byte[]
             byte[] data;
@@ -142,7 +143,7 @@ namespace Intelligent.API.Controllers
 
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
-                $"api/AIMLChatbot/{userId}/{conversationId}")
+                $"api/AIMLChatbot/conversation/{userId}/{conversationId}")
             {
                 Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
             };
@@ -154,7 +155,7 @@ namespace Intelligent.API.Controllers
             if (resp.IsSuccessStatusCode)
                 return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
 
-            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+            return BadRequest();
         }
 
         /// <summary>
@@ -164,9 +165,12 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId">The conversation ID.</param>
         /// <param name="messageId">The individual message ID.</param>
         /// <returns></returns>
+        ///
+
         [HttpPost("conversation/{userId}/{conversationId}/{messageId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<object> PostUserMessageAsync(string userId, string conversationId, string messageId, [FromForm]FileUploadRequest request)
+        [Consumes(MimeTypes.Misc.FormData)]
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
+        public async Task<ActionResult> UploadUserMessageAsync(string userId, string conversationId, string messageId, [FromForm]FileUploadRequest request)
         {
             // Read the File into a Byte[]
             byte[] data;
@@ -175,7 +179,7 @@ namespace Intelligent.API.Controllers
 
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
-                $"api/AIMLChatbot/{userId}/{conversationId}")
+                $"api/AIMLChatbot/conversation/{userId}/{conversationId}/{messageId}")
             {
                 Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
             };
@@ -187,7 +191,7 @@ namespace Intelligent.API.Controllers
             if (resp.IsSuccessStatusCode)
                 return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
 
-            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+            return BadRequest();
         }
 
         /// <summary>
@@ -198,21 +202,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpDelete("conversation/{userId}/{conversationId}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        public async Task<object> DeleteUserConversationAsync(string userId, string conversationId) //=> throw new NotImplementedException();
-        {
-            // Instantiate the request
-            var req = new HttpRequestMessage(HttpMethod.Delete,
-                $"api/AIMLChatbot/{userId}/{conversationId}");
-
-            // Send the request via HttpClient received through Dependency Injection
-            var resp = await _imrClient.SendAsync(req);
-
-            // TODO: Handle responses based on the response code from the Private API
-            if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
-
-            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
-        }
+        public async Task<object> DeleteUserConversationAsync(string userId, string conversationId) => throw new NotImplementedException();
 
         /// <summary>
         /// 
@@ -242,6 +232,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpPut("conversation/{userId}/{conversationId}/{messageId}")]
         public async Task<object> HideMessageAsync(string userId, string conversationId, string messageId) => throw new NotImplementedException();
+
         #endregion
     }
 }
