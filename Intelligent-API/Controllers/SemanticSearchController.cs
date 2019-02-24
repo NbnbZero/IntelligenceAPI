@@ -45,11 +45,11 @@ namespace Intelligent.API.Controllers
         /// 
         /// </summary>
         /// <param name="userId">The User's ID.</param>
-        /// <param name="documentId">The requested Document's Id.</param>
+        /// <param name="documentTag">The requested Document's Id.</param>
         /// <returns></returns>
-        [HttpGet("{userId}/tag/{documentId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string documentId) => throw new NotImplementedException();
+        [HttpGet("{userId}/tag/{documentTag}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<DocumentReferenceResponse>))]
+        public async Task<ActionResult<IList<DocumentReferenceResponse>>> GetUserImageTagSetAsync(string userId, string documentTag) => throw new NotImplementedException();
 
         /// <summary>
         /// Gets a reference to user's stored image by <paramref name="imageTag"/> and <paramref name="index"/>.
@@ -58,9 +58,9 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <param name="index">The non-zero based index of the image in the tag set.</param>
         /// <returns></returns>
-        [HttpGet("{userId}/tag/{documentId}/{index}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string documentId, int index) => throw new NotImplementedException();
+        [HttpGet("{userId}/tag/{documentTag}/{index}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string userId, string documentTag, int index) => throw new NotImplementedException();
 
         /// <summary>
         /// 
@@ -69,20 +69,20 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <param name="imageId">The requested Image's ID.</param>
         /// <returns></returns>
-        [HttpGet("{userId}/tag/{imageTag}/image/{imageId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, string imageId)
+        [HttpGet("{userId}/tag/{documentTag}/document/{documentId}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string userId, string documentTag, string documentId)
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}");
+                $"api/semanticSearch/{userId}/tag/{documentTag}/document/{documentId}");
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
@@ -94,10 +94,10 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("{userId}/tag/{documentId}")]
+        [HttpPost("{userId}/tag/{documentTag}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
-        public async Task<ActionResult> UploadUserImageAsync(string userId, string documentId, [FromForm]FileUploadRequest request)
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult> UploadUserImageAsync(string userId, string documentTag, [FromForm]FileUploadRequest request)
         {
             // Read the File into a Byte[]
             byte[] data;
@@ -106,7 +106,7 @@ namespace Intelligent.API.Controllers
 
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
-                $"api/augmentedReality/{userId}/tag/{documentId}")
+                $"api/semanticSearch/{userId}/tag/{documentTag}")
             {
                 Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
             };
@@ -116,7 +116,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest();
         }
@@ -127,12 +127,12 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
-        [HttpDelete("{userId}/tag/{documentId}")]
-        public async Task<object> DeleteUserImageTagSetAsync(string userId, string documentId)// => throw new NotImplementedException();
+        [HttpDelete("{userId}/tag/{documentTag}")]
+        public async Task<object> DeleteUserImageTagSetAsync(string userId, string documentTag)// => throw new NotImplementedException();
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Delete,
-                $"api/augmentedReality/{userId}/tag/{documentId}")
+                $"api/augmentedReality/{userId}/tag/{documentTag}")
             {
                 // Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
 
@@ -143,7 +143,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest();
         }
@@ -155,7 +155,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="imageId"></param>
         /// <returns></returns>
-        public async Task<ActionResult<ImageReferenceResponse>> DeleteUserImageAsync(string userId, string imageTag, string imageId) => throw new NotImplementedException();
+        public async Task<ActionResult<DocumentReferenceResponse>> DeleteUserImageAsync(string userId, string documentTag, string documentId) => throw new NotImplementedException();
         #endregion
 
         #region Semantic Search - Vuforia
