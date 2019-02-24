@@ -534,7 +534,7 @@
                 "id": "bad5fd10-622b-4062-a950-1c33f8bb1f7d",
                 "exec": [
                   "pm.variables.set(\"user\", \"user554\");",
-                  "pm.variables.set(\"tag\", \"777\");"
+                  "pm.variables.set(\"tag\", \"apple\");"
                 ],
                 "type": "text/javascript"
               }
@@ -564,7 +564,7 @@
           "response": []
         },
         {
-          "name": "Upload User Image",
+          "name": "Upload User Document",
           "event": [
             {
               "listen": "prerequest",
@@ -572,7 +572,7 @@
                 "id": "3cde530f-59eb-41c5-ba79-accc7564ef60",
                 "exec": [
                   "pm.variables.set(\"user\", \"user554\");",
-                  "pm.variables.set(\"tag\", \"777\");"
+                  "pm.variables.set(\"tag\", \"apple\");"
                 ],
                 "type": "text/javascript"
               }
@@ -621,7 +621,7 @@
                   ]
                 },
                 "url": {
-                  "raw": "{{https}}/api/semanticSearch/user554/tag/777",
+                  "raw": "{{https}}/api/semanticSearch/user554/tag/apple",
                   "host": [
                     "{{https}}"
                   ],
@@ -630,7 +630,7 @@
                     "semanticSearch",
                     "user554",
                     "tag",
-                    "777"
+                    "apple"
                   ]
                 }
               },
@@ -664,7 +664,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"777\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"9198dc1c-0c1e-4a0b-a8fc-2e06a64c55f6\"\n}"
+              "body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"9198dc1c-0c1e-4a0b-a8fc-2e06a64c55f6\"\n}"
             }
           ]
         },
@@ -677,7 +677,7 @@
                 "id": "de65acb2-a0a4-4e1f-96bd-0d2a479519ce",
                 "exec": [
                   "pm.variables.set(\"user\", \"user554\");",
-                  "pm.variables.set(\"tag\", \"777\");"
+                  "pm.variables.set(\"tag\", \"apple\");"
                 ],
                 "type": "text/javascript"
               }
