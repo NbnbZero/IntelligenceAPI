@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +12,12 @@ namespace Intelligent.API.Models.Response
     {
         [JsonProperty("id")]
         public string DocumentId { get; set; }
+
+        [JsonProperty("tag")]
+        public string ImageTag { get; set; }
+
+        [JsonProperty("fileName")]
+        public string FileName { get; set; }
 
         [JsonProperty("metadata")]
         public IList<MetaTag> Metadata { get; set; }
