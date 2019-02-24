@@ -99,26 +99,50 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult> UploadUserImageAsync(string userId, string documentTag, [FromForm]FileUploadRequest request)
         {
-            // Read the File into a Byte[]
-            byte[] data;
-            using (var br = new BinaryReader(request.File.OpenReadStream()))
-                data = br.ReadBytes((int)request.File.Length);
+            // Get the User's image directory in Cloud File Storage
+            var imgDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "img");
 
-            // Instantiate the request
-            var req = new HttpRequestMessage(HttpMethod.Post,
-                $"api/semanticSearch/{userId}/tag/{documentTag}")
+            // Get the Image Tag specific directory from the image directory
+            var tagDir = imgDir.GetDirectoryReference(documentTag);
+
+            // Create the Image Tag specific directory if it does not exist
+            await tagDir.CreateIfNotExistsAsync();
+
+            // Get/Create a file reference
+            var upload = tagDir.GetFileReference(request.File.FileName);
+
+            // TODO: What happens if a file already exists under the same name?
+            await upload.DeleteIfExistsAsync();
+
+            // Upload the image via Stream
+            await upload.UploadFromStreamAsync(request.File.OpenReadStream());
+
+            // TODO: What happens if the upload fails?
+
+
+            // Create an entry in the Cosmos DB Document Database
+            var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
             {
-                Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
-            };
+                UserId = userId,
+                FileName = upload.Name, // request.File.FileName,
+                ContentType = request.File.ContentType,
+                Reference = upload.Uri,
+                Metadata = new List<MetaTag>()
+                {
+                    new MetaTag() { Key = "DocumentTag", Type = typeof(string).ToString(), Value = documentTag },
+                    new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
+                }
+            }, UploadFileDocument.Partition);
 
-            // Send the request via HttpClient received through Dependency Injection
-            var resp = await _imrClient.SendAsync(req);
-
-            // TODO: Handle responses based on the response code from the Private API
-            if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
-
-            return BadRequest();
+            // Return a response to the Client
+            return Ok(new ImageReferenceResponse()
+            {
+                ImageId = document.Id,
+                ImageTag = documentTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                ImageReference = document.Reference.ToString()
+            });
         }
 
         /// <summary>
