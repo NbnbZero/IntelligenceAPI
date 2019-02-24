@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Intelligent.Data.Generic;
@@ -13,6 +13,9 @@ namespace Intelligent.Data.Cosmos.Models
 
         [JsonProperty(PropertyName = "userId")]
         public string UserId { get; set; }
+
+        [JsonProperty(PropertyName = "documentId")]
+        public string DocumentId { get; set; }
 
         [JsonProperty(PropertyName = "fileName")]
         public string FileName { get; set; }
