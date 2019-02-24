@@ -548,7 +548,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{azure-dev}}/api/semanticSearch/{{user}}/tag/{{Id}}",
+              "raw": "{{azure-dev}}/api/semanticSearch/{{user}}/tag/{{tag}}",
               "host": [
                 "{{azure-dev}}"
               ],
@@ -557,7 +557,7 @@
                 "semanticSearch",
                 "{{user}}",
                 "tag",
-                "{{Id}}"
+                "{{tag}}"
               ]
             }
           },
@@ -592,7 +592,7 @@
               ]
             },
             "url": {
-              "raw": "{{public-dev}}/api/semanticSearch/{{user}}/tag/{{Id}}",
+              "raw": "{{public-dev}}/api/semanticSearch/{{user}}/tag/{{tag}}",
               "host": [
                 "{{public-dev}}"
               ],
@@ -601,7 +601,7 @@
                 "semanticSearch",
                 "{{user}}",
                 "tag",
-                "{{Id}}"
+                "{{tag}}"
               ]
             }
           },
@@ -627,7 +627,7 @@
                   ],
                   "path": [
                     "api",
-                    "cognitiveVision",
+                    "semanticSearch",
                     "user554",
                     "tag",
                     "777"
@@ -664,7 +664,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"apple\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"9198dc1c-0c1e-4a0b-a8fc-2e06a64c55f6\"\n}"
+              "body": "{\n    \"id\": \"748c4508-e0b3-4d46-81a2-b887d6daecbb\",\n    \"tag\": \"777\",\n    \"fileName\": \"mssqlserver-hammer.png\",\n    \"metadata\": [\n        {\n            \"key\": \"ImageTag\",\n            \"value\": \"apple\",\n            \"_type\": \"System.String\"\n        },\n        {\n            \"key\": \"Length\",\n            \"value\": 153667,\n            \"_type\": \"System.Int64\"\n        }\n    ],\n    \"ref\": \"https://imruserstore.file.core.windows.net/testcompany/user554/img/apple/mssqlserver-hammer.png\",\n    \"requestId\": \"9198dc1c-0c1e-4a0b-a8fc-2e06a64c55f6\"\n}"
             }
           ]
         }
