@@ -57,8 +57,8 @@ namespace Intelligent.API.Controllers
         /// <param name="userId">The User's ID.</param>
         /// <returns></returns>
         [HttpGet("conversation/{userId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<object> GetUserAsync(string userId, string conversationTag)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<DocumentReferenceResponse>))]
+        public async Task<ActionResult> GetUserAsync(string userId, string conversationTag)
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
@@ -69,7 +69,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
 
@@ -83,8 +83,8 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId">The conversation ID.</param>
         /// <returns></returns>
         [HttpGet("conversation/{userId}/{conversationId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<object> GetUserConversationAsync(string userId, string conversationId)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult> GetUserConversationAsync(string userId, string conversationId)
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
@@ -95,7 +95,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
@@ -108,8 +108,8 @@ namespace Intelligent.API.Controllers
         /// <param name="messageId">The individual message ID.</param>
         /// <returns></returns>
         [HttpGet("conversation/{userId}/{conversationId}/{messageId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
-        public async Task<object> GetUserMessageAsync(string userId, string conversationId, string messageId)
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult> GetUserMessageAsync(string userId, string conversationId, string messageId)
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
@@ -120,7 +120,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
@@ -133,7 +133,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpPost("conversation/{userId}/{conversationId}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> PostUserConversationAsync(string userId, string conversationId, [FromForm]FileUploadRequest request)
         {
             // Read the File into a Byte[]
@@ -153,9 +153,9 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
-            return BadRequest();
+            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Intelligent.API.Controllers
 
         [HttpPost("conversation/{userId}/{conversationId}/{messageId}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> UploadUserMessageAsync(string userId, string conversationId, string messageId, [FromForm]FileUploadRequest request)
         {
             // Read the File into a Byte[]
@@ -189,7 +189,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest();
         }
