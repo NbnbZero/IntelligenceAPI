@@ -132,15 +132,14 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId">The conversation ID.</param>
         /// <returns></returns>
         [HttpPost("conversation/{userId}/{conversationId}")]
-        [Consumes(MimeTypes.Misc.FormData)]
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
-        public async Task<ActionResult> PostUserConversationAsync(string userId, string conversationId, [FromForm]FileUploadRequest request)
+        public async Task<ActionResult> PostUserConversationAsync(string userId, string conversationId, [FromBody]FileUploadRequest request)
         {
             // Read the File into a Byte[]
             byte[] data;
             using (var br = new BinaryReader(request.File.OpenReadStream()))
                 data = br.ReadBytes((int)request.File.Length);
-
+             
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
                 $"api/AIMLChatbot/conversation/{userId}/{conversationId}")
@@ -157,7 +156,7 @@ namespace Intelligent.API.Controllers
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
-
+        /*
         /// <summary>
         /// Gets a reference to user's stored message.
         /// </summary>
@@ -168,7 +167,6 @@ namespace Intelligent.API.Controllers
         ///
 
         [HttpPost("conversation/{userId}/{conversationId}/{messageId}")]
-        [Consumes(MimeTypes.Misc.FormData)]
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> UploadUserMessageAsync(string userId, string conversationId, string messageId, [FromForm]FileUploadRequest request)
         {
@@ -193,7 +191,7 @@ namespace Intelligent.API.Controllers
 
             return BadRequest();
         }
-
+        */
         /// <summary>
         /// 
         /// </summary>
