@@ -58,14 +58,14 @@ namespace Intelligent.API.Controllers
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
             //Document should contain parameters that match the variables -- access and compare through `document`
             //info may be in the metadata -- check postman
-            if(document.FileName != imageTag){
+            //if(document.FileName != imageTag){
                 //return response for bad parameters
-                return BadRequest();
-            }
-            if(document.UserId != userId){
+                //return BadRequest();
+           // }
+           // if(document.UserId != userId){
                 //return response for bad authetication
-                return BadRequest();
-            }
+            //    return BadRequest();
+          //  }
 
             return Ok(new ImageReferenceResponse()
             {
