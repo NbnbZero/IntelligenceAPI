@@ -59,7 +59,7 @@ namespace Intelligent.API.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="documents">The requested documents list.</param>
+        /// <param name="document">The requested documents list.</param>
         /// <param name="documentId">The document's Id.</param>
         /// <returns></returns>
         [HttpPost("documents/{documentId}")]

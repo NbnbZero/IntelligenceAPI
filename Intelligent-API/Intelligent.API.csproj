@@ -9,6 +9,7 @@
     <Folder Include="Extensions\" />
     <Folder Include="Contracts\" />
     <Folder Include="wwwroot\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,4 +23,7 @@
     <ProjectReference Include="..\Intelligent.Data\Intelligent.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Framework\IMessagingService.cs" />
+  </ItemGroup>
 </Project>

@@ -25,5 +25,7 @@ namespace Intelligent.Data.Cosmos.Models
 
         [JsonProperty(PropertyName = "_metadata")]
         public IList<MetaTag> Metadata { get; set; }
+        public string DocumentId { get; set; }
+        public object ImageTag { get; set; }
     }
 }
