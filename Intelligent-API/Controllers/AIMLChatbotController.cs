@@ -19,6 +19,7 @@ using System.Net.Http;
 using Intelligent.API.Models;
 using System.Text;
 using Intelligent.API.Data;
+using Newtonsoft.Json;
 
 namespace Intelligent.API.Controllers
 {
@@ -78,6 +79,9 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> GetUserConversationAsync(string userId, string conversationId)
         {
+            Console.WriteLine("HELLO THERE");
+            Console.WriteLine(conversationId);
+            Console.WriteLine("HELLO THERE");
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
                 $"api/AIMLChatbot/conversation/{userId}/{conversationId}");
@@ -99,14 +103,15 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId">The conversation ID.</param>
         /// <returns></returns>
         [HttpPost("conversation/{userId}/{conversationId}")]
-        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(MessageReferenceResponse))]
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> PostUserConversationAsync(string userId, string conversationId, Message request)
         {
+            string cont = JsonConvert.SerializeObject(request);
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
                 $"api/AIMLChatbot/conversation/{userId}/{conversationId}")
             {
-                Content = new StringContent("{\"to\": \"" + request.ToUser + "\",\"from\": \"" + request.FromUser + "\",\"timestamp\": \"" + request.Timestamp + "\",\"body\": \"" + request.Body + "\"}")
+                Content = new StringContent(cont, Encoding.UTF8, MimeTypes.Application.Json)
             };
 
             // Send the request via HttpClient received through Dependency Injection
@@ -114,7 +119,7 @@ namespace Intelligent.API.Controllers
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-                return Ok(resp.Content.ReadAsAsync<MessageReferenceResponse>());
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
@@ -126,7 +131,6 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId"></param>
         /// <returns></returns>
         [HttpDelete("conversation/{userId}/{conversationId}")]
-        [Consumes(MimeTypes.Misc.FormData)]
         public async Task<object> DeleteUserConversationAsync(string userId, string conversationId) => throw new NotImplementedException();
 
         /// <summary>
@@ -145,8 +149,28 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId"></param>
         /// <param name="messageId"></param>
         /// <returns></returns>
-        [HttpDelete("conversation/{userId}/{conversationId}/{messageId}")]
-        public async Task<object> DeleteMessageAsync(string userId, string conversationId, string messageId) => throw new NotImplementedException();
+        [HttpPost("conversation/{userId}/{conversationId}/{messageId}")]
+        public async Task<object> UploadMessageAsync(string userId, string conversationId, string messageId, Message request)
+
+        {
+            string cont = JsonConvert.SerializeObject(request);
+
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Post,
+                $"api/AIMLChatbot/conversation/{userId}/{conversationId}/{messageId}")
+            {
+                Content = new StringContent(cont)
+            };
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
+
+            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+        }
 
         #endregion
     }

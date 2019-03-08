@@ -5,11 +5,11 @@ namespace Intelligent.API.Data
 {
     public class Message
     {
-        [JsonProperty(PropertyName = "from")]
-        public string FromUser { get; set; }
-
         [JsonProperty(PropertyName = "to")]
         public string ToUser { get; set; }
+
+        [JsonProperty(PropertyName = "from")]
+        public string FromUser { get; set; }
 
         [JsonProperty(PropertyName = "timestamp")]
         public long Timestamp { get; set; }
