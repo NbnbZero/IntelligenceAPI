@@ -58,11 +58,11 @@ namespace Intelligent.API.Controllers
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
             //Document should contain parameters that match the variables -- access and compare through `document`
             //info may be in the metadata -- check postman
-            if(document.imageTag != imageTag){
+            if(document.FileName != imageTag){
                 //return response for bad parameters
                 return BadRequest();
             }
-            if(document.userId != userId){
+            if(document.UserId != userId){
                 //return response for bad authetication
                 return BadRequest();
             }
@@ -135,6 +135,9 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, string imageId)
         {
+            // Query for Upload File Document with ID <c>imageId</c>
+            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
+
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
                 $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}"  );
@@ -282,7 +285,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         /// ben
         [HttpGet("{userId}/tag/{imageTag}/index/{index}")]
-        public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, int index)
+        public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, String imageId, int index)
         {
             // Query for Upload File Document with ID <c>imageId</c>
             var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
@@ -290,16 +293,16 @@ namespace Intelligent.API.Controllers
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
             //Document should contain parameters that match the variables -- access and compare through `document`
             //info may be in the metadata -- check postman
-            if(document.imageTag != imageTag){
+            if(document.FileName != imageTag){
                 //return response for bad parameters
                 return BadRequest();
             }
-            if(document.userId != userId){
+            if(document.UserId != userId){
                 //return response for bad authetication
                 return BadRequest();
             }
-            if(document.index != index){
-                return BadRequst();
+            if(document.DocumentId != imageId){
+                return BadRequest();
             }
             return Ok(new ImageReferenceResponse()
             {
@@ -360,7 +363,7 @@ namespace Intelligent.API.Controllers
             //Check to see if File exists under the same name already.
             try
             {
-                var fileExists = upload.Exists();
+                var fileExists = upload.DeleteIfExistsAsync();
             }
             catch (Exception e)
             {

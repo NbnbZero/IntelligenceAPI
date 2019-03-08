@@ -26,7 +26,7 @@ namespace Intelligent.API.Controllers
     /// <see cref="IntelligentMixedRealityController"/>
 //    [ApiVersion("1.0")]                                   // TODO: Un-Comment after applying settings for API versioning
     [AllowAnonymous]                                        // TODO: Remove for Authentication
-//    [Route("api/v{version:apiVersion}/augmentedReality")] // TODO: The versioned API Route
+                                                            //    [Route("api/v{version:apiVersion}/augmentedReality")] // TODO: The versioned API Route
     [Route("api/AIMLChatbot")]                         // TODO: Remove after applying settings for API versioning
     public class AIMLChatbotController : IntelligentMixedRealityController
     {
@@ -214,7 +214,7 @@ namespace Intelligent.API.Controllers
         /// <returns></returns>
         [HttpDelete("conversation/{userId}/{conversationId}/{messageId}")]
         public async Task<object> DeleteMessageAsync(string userId, string conversationId, string messageId) => throw new NotImplementedException();
-        
+
         /// <summary>
         /// 
         /// </summary>
