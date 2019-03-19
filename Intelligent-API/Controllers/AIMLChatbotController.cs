@@ -109,7 +109,7 @@ namespace Intelligent.API.Controllers
             string cont = JsonConvert.SerializeObject(request);
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
-                $"api/AIMLChatbot/conversation/{userId}/{conversationId}")
+                $"api/messages/{userId}/conversation/{conversationId}")
             {
                 Content = new StringContent(cont, Encoding.UTF8, MimeTypes.Application.Json)
             };
