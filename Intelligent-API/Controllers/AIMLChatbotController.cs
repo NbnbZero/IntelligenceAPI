@@ -79,9 +79,6 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> GetUserConversationAsync(string userId, string conversationId)
         {
-            Console.WriteLine("HELLO THERE");
-            Console.WriteLine(conversationId);
-            Console.WriteLine("HELLO THERE");
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
                 $"api/AIMLChatbot/conversation/{userId}/{conversationId}");
