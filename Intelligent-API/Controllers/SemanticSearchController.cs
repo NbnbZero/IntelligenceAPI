@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Intelligent.API.Framework;
+using Intelligent.API.Models;
 using Intelligent.API.Models.Request;
 using Intelligent.API.Models.Response;
 using Intelligent.Data.AzureFiles;
@@ -18,62 +21,95 @@ using Intelligent.Data.Generic;
 namespace Intelligent.API.Controllers
 {
     /// <summary>
-    /// API Controller for all things having to do with Semantic Search.
+    /// API Controller for all things having to do with Augmented Reality.
     /// </summary>
     /// <see cref="IntelligentMixedRealityController"/>
 //    [ApiVersion("1.0")]                                   // TODO: Un-Comment after applying settings for API versioning
     [AllowAnonymous]                                        // TODO: Remove for Authentication
                                                             //    [Route("api/v{version:apiVersion}/augmentedReality")] // TODO: The versioned API Route
     [Route("api/semanticSearch")]                         // TODO: Remove after applying settings for API versioning
-    public class SemanticSearchController : IntelligentMixedRealityController
+    public class semanticSearchController : IntelligentMixedRealityController
     {
-        /// <summary>Initializes a new instance of the <see cref="SemanticSearchController"/> class.</summary>
+
+        private HttpClient _imrClient;
+
+        /// <summary>Initializes a new instance of the <see cref="semanticSearchController"/> class.</summary>
         /// <param name="logger">The logger instance used to log any messages from this controller.</param>
-        public SemanticSearchController(ILogger<SemanticSearchController> logger) : base(logger)
+        public semanticSearchController(IHttpClientFactory factory, ILogger<semanticSearchController> logger) : base(logger)
         {
+            _imrClient = factory.CreateClient("private-api");
         }
 
-        #region Semantic Search - Document
+        #region Semantic Search - Documents
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="documents">The requested documents list.</param>
-        /// <param name="documentId">The document's Id.</param>
+        /// <param name="userId">The User's ID.</param>
+        /// <param name="imageTag">The requested Image's tag.</param>
         /// <returns></returns>
-        [HttpGet("documents/{documentId}")]
+        [HttpGet("{userId}/tag/{documentTag}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<DocumentReferenceResponse>))]
+        public async Task<ActionResult<IList<DocumentReferenceResponse>>> GetUserImageTagSetAsync(string userId, string documentTag) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Gets a reference to user's stored image by <paramref name="imageTag"/> and <paramref name="index"/>.
+        /// </summary>
+        /// <param name="userId">The User's ID.</param>
+        /// <param name="imageTag">The requested Image's tag.</param>
+        /// <param name="index">The non-zero based index of the image in the tag set.</param>
+        /// <returns></returns>
+        [HttpGet("{userId}/tag/{documentTag}/{index}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
-        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string documents, string documentId)
-        {
-            // Query for Search File Document with ID <c>documentId</c>
-            var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, documentId);
+        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string userId, string documentTag, int index) => throw new NotImplementedException();
 
-            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
-            return Ok(new DocumentReferenceResponse()
-            {
-                DocumentId = document.Id,
-                Metadata = document.Metadata,
-                DocumentReference = document.Reference.ToString()
-            });
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId">The User's ID.</param>
+        /// <param name="imageTag">The requested Image's tag.</param>
+        /// <param name="imageId">The requested Image's ID.</param>
+        /// <returns></returns>
+        [HttpGet("{userId}/tag/{documentTag}/document/{documentId}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult<DocumentReferenceResponse>> GetUserImageAsync(string userId, string documentTag, string documentId)
+        {
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Get,
+                $"api/semanticSearch/{userId}/tag/{documentTag}/document/{documentId}");
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
+
+            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="document">The requested documents list.</param>
-        /// <param name="documentId">The document's Id.</param>
+        /// <param name="userId"></param>
+        /// <param name="imageTag"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("documents/{documentId}")]
+        [HttpPost("{userId}/tag/{documentTag}")]
         [Consumes(MimeTypes.Misc.FormData)]
-        public async Task<ActionResult<DocumentReferenceResponse>> UploadUserImageAsync(string document, string documentId, [FromForm]FileUploadRequest request)
+        [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
+        public async Task<ActionResult> UploadUserImageAsync(string userId, string documentTag, [FromForm]FileUploadRequest request)
         {
-            // Get the document directory in Cloud File Storage
-            var docDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", documentId, "doc");
+            // Get the User's image directory in Cloud File Storage
+            var docDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "doc");
+
+            // Get the Image Tag specific directory from the image directory
+            var tagDir = docDir.GetDirectoryReference(documentTag);
 
             // Create the Image Tag specific directory if it does not exist
-            await docDir.CreateIfNotExistsAsync();
+            await tagDir.CreateIfNotExistsAsync();
 
             // Get/Create a file reference
-            var upload = docDir.GetFileReference(request.File.FileName);
+            var upload = tagDir.GetFileReference(request.File.FileName);
 
             // TODO: What happens if a file already exists under the same name?
             await upload.DeleteIfExistsAsync();
@@ -83,15 +119,17 @@ namespace Intelligent.API.Controllers
 
             // TODO: What happens if the upload fails?
 
+
             // Create an entry in the Cosmos DB Document Database
-            var doc = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
+            var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
             {
-                DocumentId = documentId,
+                UserId = userId,
                 FileName = upload.Name, // request.File.FileName,
                 ContentType = request.File.ContentType,
                 Reference = upload.Uri,
                 Metadata = new List<MetaTag>()
                 {
+                    new MetaTag() { Key = "DocumentTag", Type = typeof(string).ToString(), Value = documentTag },
                     new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
                 }
             }, UploadFileDocument.Partition);
@@ -99,11 +137,49 @@ namespace Intelligent.API.Controllers
             // Return a response to the Client
             return Ok(new DocumentReferenceResponse()
             {
-                DocumentId = doc.Id,
-                Metadata = doc.Metadata,
-                DocumentReference = doc.Reference.ToString()
+                DocumentId = document.DocumentId,
+                DocumentTag = documentTag,
+                FileName = document.FileName,
+                Metadata = document.Metadata,
+                DocumentReference = document.Reference.ToString()
             });
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="imageTag"></param>
+        /// <returns></returns>
+        [HttpDelete("{userId}/tag/{documentTag}")]
+        public async Task<object> DeleteUserImageTagSetAsync(string userId, string documentTag)// => throw new NotImplementedException();
+        {
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Delete,
+                $"api/semanticSearch/{userId}/tag/{documentTag}")
+            {
+                // Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
+
+            };
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
+
+            return BadRequest();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="imageTag"></param>
+        /// <param name="imageId"></param>
+        /// <returns></returns>
+        public async Task<ActionResult<DocumentReferenceResponse>> DeleteUserImageAsync(string userId, string documentTag, string documentId) => throw new NotImplementedException();
         #endregion
 
         #region Semantic Search - Vuforia
