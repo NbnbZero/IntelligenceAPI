@@ -202,7 +202,7 @@ namespace Intelligent.API.Controllers
                     new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
                 }
             }, UploadFileDocument.Partition);
-
+            
             // Return a response to the Client
             return Ok(new ImageReferenceResponse()
             {
@@ -504,14 +504,28 @@ namespace Intelligent.API.Controllers
              string targetId = "[target id]";
 
              string url = "https://vws.vuforia.com";
-            //HttpGet getRequest = new HttpGet();
+
             HttpClient client = new DefaultHttpClient();
+
             Uri vuforiaUri = new Uri(url + "/targets/" + targetId);
 
-            //wr is request
+            var req = new HttpRequestMessage(vuforiaUri);
+
             HttpWebRequest request = (HttpWebRequest) WebRequest.Create(vuforiaUri);
+
              request.Headers.Add(vuforiaUri);
+
              HttpWebResponse webResponse = (HttpWebResponse) request.GetResponse();
+
+             if (webResponse.IsSuccessStatusCode)
+             {
+                 return Ok(webResponse.Content.ReadAsAsync<ImageReferenceResponse>());
+             }
+             else
+             {
+                 return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+             }
+             
 
         }
         #endregion
