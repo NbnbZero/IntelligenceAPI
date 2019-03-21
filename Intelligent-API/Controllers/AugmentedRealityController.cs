@@ -138,13 +138,18 @@ namespace Intelligent.API.Controllers
         {
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
+<<<<<<< HEAD
                 $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}"  );
+=======
+                $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}");
+>>>>>>> master
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
+<<<<<<< HEAD
                 return Ok(new ImageReferenceResponse()
                 {
                     ImageId = document.Id,
@@ -153,6 +158,9 @@ namespace Intelligent.API.Controllers
                     Metadata = document.Metadata,
                     ImageReference = document.Reference.ToString()
                 });
+=======
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
+>>>>>>> master
 
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
@@ -170,25 +178,26 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult> UploadUserImageAsync(string userId, string imageTag, [FromForm]FileUploadRequest request)
         {
-            // Get the User's image directory in Cloud File Storage
-            var imgDir = await CloudFileContext.Instance.GetShareUserSubDirectoryAsync("testcompany", userId, "img");
+            // Read the File into a Byte[]
+            byte[] data;
+            using (var br = new BinaryReader(request.File.OpenReadStream()))
+                data = br.ReadBytes((int)request.File.Length);
 
-            // Get the Image Tag specific directory from the image directory
-            var tagDir = imgDir.GetDirectoryReference(imageTag);
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Post,
+                $"api/augmentedReality/{userId}/tag/{imageTag}")
+            {
+                Content = new MultipartFormDataContent { { new ByteArrayContent(data), "file", request.File.FileName } }
+            };
 
-            // Create the Image Tag specific directory if it does not exist
-            await tagDir.CreateIfNotExistsAsync();
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
 
-            // Get/Create a file reference
-            var upload = tagDir.GetFileReference(request.File.FileName);
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
 
-            // TODO: What happens if a file already exists under the same name?
-
-            // Upload the image via Stream
-            await upload.UploadFromStreamAsync(request.File.OpenReadStream());
-
-            // TODO: What happens if the upload fails?
-
+<<<<<<< HEAD
             // Create an entry in the Cosmos DB Document Database
             var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
             {
@@ -212,6 +221,9 @@ namespace Intelligent.API.Controllers
                 Metadata = document.Metadata,
                 ImageReference = document.Reference.ToString()
             });
+=======
+            return BadRequest();
+>>>>>>> master
         }
 
         /// <summary>

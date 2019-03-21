@@ -5,9 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile1.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Exceptions\" />
     <Folder Include="Extensions\" />
     <Folder Include="Contracts\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

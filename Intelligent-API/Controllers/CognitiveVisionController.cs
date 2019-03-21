@@ -79,9 +79,6 @@ namespace Intelligent.API.Controllers
             {
                 return NotFound();
             }
-            if (!imageTag.Equals(document.ImageTag)) {
-                return NotFound();
-            }
 
             return Ok(new ImageReferenceResponse()
             {
