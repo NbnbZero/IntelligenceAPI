@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Okta.AspNetCore;
 using Intelligent.Data.AzureFiles;
 using Intelligent.Data.AzureTables;
 using Intelligent.Data.Cosmos;

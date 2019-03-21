@@ -1,7 +1,18 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Intelligent-API",
+    "\\Intelligent-API\\Framework",
+    "\\Intelligent-API\\obj",
+    "\\Intelligent.Data",
+    "\\Intelligent.Data\\AzureFiles",
+    "\\Intelligent.Data\\AzureTables",
+    "\\Intelligent.Data\\bin",
+    "\\Intelligent.Data\\Cosmos",
+    "\\Intelligent.Data\\Cosmos\\Models",
+    "\\Intelligent.Data\\obj",
+    "\\Postman"
   ],
-  "SelectedNode": "\\.gitignore",
+  "SelectedNode": "\\Intelligent.Data",
   "PreviewInSolutionExplorer": false
 }

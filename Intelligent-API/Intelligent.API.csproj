@@ -5,9 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile1.pubxml" />
+    <None Remove="Properties\PublishProfiles\IntelligentAPI2 - Web Deploy.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Exceptions\" />
     <Folder Include="Extensions\" />
     <Folder Include="Contracts\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="wwwroot\" />
     <Folder Include="Data\" />
   </ItemGroup>
@@ -17,6 +24,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <PackageReference Include="Okta.Sdk" Version="1.2.1" />
   </ItemGroup>
 
   <ItemGroup>
