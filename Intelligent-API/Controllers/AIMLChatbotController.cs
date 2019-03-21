@@ -79,9 +79,6 @@ namespace Intelligent.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> GetUserConversationAsync(string userId, string conversationId)
         {
-            Console.WriteLine("HELLO THERE");
-            Console.WriteLine(conversationId);
-            Console.WriteLine("HELLO THERE");
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
                 $"api/AIMLChatbot/conversation/{userId}/{conversationId}");
@@ -131,7 +128,21 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId"></param>
         /// <returns></returns>
         [HttpDelete("conversation/{userId}/{conversationId}")]
-        public async Task<object> DeleteUserConversationAsync(string userId, string conversationId) => throw new NotImplementedException();
+        public async Task<object> DeleteUserConversationAsync(string userId, string conversationId)
+        {
+            // Instantiate the request
+            var req = new HttpRequestMessage(HttpMethod.Delete,
+                $"api/messages/{userId}/conversation/{conversationId}");
+
+            // Send the request via HttpClient received through Dependency Injection
+            var resp = await _imrClient.SendAsync(req);
+
+            // TODO: Handle responses based on the response code from the Private API
+            if (resp.IsSuccessStatusCode)
+                return Ok(resp.Content.ReadAsAsync<DocumentReferenceResponse>());
+
+            return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+        }
 
         /// <summary>
         /// 
