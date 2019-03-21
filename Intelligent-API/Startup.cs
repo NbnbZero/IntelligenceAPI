@@ -32,6 +32,20 @@ namespace Intelligent.API
                     c.DefaultRequestHeaders.Add("Accept", MimeTypes.Application.Json);
                     c.DefaultRequestHeaders.Add("User-Agent", "IMR-Public");
                 });
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = OktaDefaults.MvcAuthenticationScheme;
+                })
+                .AddCookie()
+                .AddOktaMvc(new OktaMvcOptions
+                {
+                    OktaDomain = "https://{EDUTechnologic-dev-510206}",
+                    ClientId = "{clientId}",
+                    ClientSecret = "{clientSecret}"
+                });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 //            services.AddApiVersioning();
         }
@@ -68,6 +82,7 @@ namespace Intelligent.API
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
