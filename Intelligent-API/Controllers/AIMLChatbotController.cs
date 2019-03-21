@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +42,7 @@ namespace Intelligent.API.Controllers
         {
             _imrClient = factory.CreateClient("private-api");
         }
-
+        
         #region AIML Chatbot - Messaging
 
         /// <summary>
@@ -103,15 +103,15 @@ namespace Intelligent.API.Controllers
         /// <param name="conversationId">The conversation ID.</param>
         /// <returns></returns>
         [HttpPost("conversation/{userId}/{conversationId}")]
+
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(DocumentReferenceResponse))]
         public async Task<ActionResult> PostUserConversationAsync(string userId, string conversationId, Message request)
         {
-            string cont = JsonConvert.SerializeObject(request);
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
-                $"api/AIMLChatbot/conversation/{userId}/{conversationId}")
+                $"api/messages/{userId}/conversation/{conversationId}")
             {
-                Content = new StringContent(cont, Encoding.UTF8, MimeTypes.Application.Json)
+                Content = new StringContent(JsonConvert.SerializeObject(request, Formatting.Indented), Encoding.UTF8, MimeTypes.Application.Json)
             };
 
             // Send the request via HttpClient received through Dependency Injection
@@ -153,13 +153,11 @@ namespace Intelligent.API.Controllers
         public async Task<object> UploadMessageAsync(string userId, string conversationId, string messageId, Message request)
 
         {
-            string cont = JsonConvert.SerializeObject(request);
-
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Post,
-                $"api/AIMLChatbot/conversation/{userId}/{conversationId}/{messageId}")
+                $"api/messages/{userId}/conversation/{conversationId}/{messageId}")
             {
-                Content = new StringContent(cont)
+                Content = new StringContent(JsonConvert.SerializeObject(request, Formatting.Indented), Encoding.UTF8, MimeTypes.Application.Json)
             };
 
             // Send the request via HttpClient received through Dependency Injection
