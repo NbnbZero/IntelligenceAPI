@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 //TODO: Add usings for vuforia services
 using Intelligent.Data.Cosmos.Models;
 using Intelligent.Data.Generic;
+using Okta.Sdk.Internal;
 
 namespace Intelligent.API.Controllers
 {
@@ -85,6 +86,7 @@ namespace Intelligent.API.Controllers
         /// <param name="index">The non-zero based index of the image in the tag set.</param>
         /// <returns></returns>
         /// sophie
+        [Authorize]
         [HttpGet("{userId}/tag/{imageTag}/{index}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, int index)
@@ -104,26 +106,7 @@ namespace Intelligent.API.Controllers
         }
 
 
-//            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
-//            //Document should contain parameters that match the variables -- access and compare through `document`
-//            //info may be in the metadata -- check postman
-//            if(document.imageTag != imageTag){
-//                //return response for bad parameters
-//                return BadRequest();
-//            }
-//            if(document.userId != userId){
-//                //return response for bad authetication
-//                return BadRequest();
-//            }
-//            return Ok(new ImageReferenceResponse()
-//            {
-//                Index = document.index,
-//                ImageTag = imageTag,
-//                FileName = document.FileName,
-//                Metadata = document.Metadata,
-//                ImageReference = document.Reference.ToString()
-//            });
-//        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -132,6 +115,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageId">The requested Image's ID.</param>
         /// <returns></returns>
         /// implemented
+        [Authorize]
         [HttpGet("{userId}/tag/{imageTag}/image/{imageId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, string imageId)
@@ -173,6 +157,7 @@ namespace Intelligent.API.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         /// implemented
+        [Authorize]
         [HttpPost("{userId}/tag/{imageTag}")]
         [Consumes(MimeTypes.Misc.FormData)]
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
@@ -502,41 +487,41 @@ namespace Intelligent.API.Controllers
         #endregion
 
         #region Augmented Reality - Vuforia
-        [HttpGet("{userId}/tag/{imageTag}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
-        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsyncVuforia(string userId, string imageTag, string imageId)
-        {
-             string accessKey = "[server access key]";
-
-             string secretKey = "[server secret]";
-
-             string targetId = "[target id]";
-
-             string url = "https://vws.vuforia.com";
-
-            HttpClient client = new DefaultHttpClient();
-
-            Uri vuforiaUri = new Uri(url + "/targets/" + targetId);
-
-            var req = new HttpRequestMessage(vuforiaUri);
-
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(vuforiaUri);
-
-             request.Headers.Add(vuforiaUri);
-
-             HttpWebResponse webResponse = (HttpWebResponse) request.GetResponse();
-
-             if (webResponse.IsSuccessStatusCode)
-             {
-                 return Ok(webResponse.Content.ReadAsAsync<ImageReferenceResponse>());
-             }
-             else
-             {
-                 return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
-             }
-             
-
-        }
+//        [HttpGet("{userId}/tag/{imageTag}")]
+//        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
+//        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsyncVuforia(string userId, string imageTag, string imageId)
+//        {
+//             string accessKey = "[server access key]";
+//
+//             string secretKey = "[server secret]";
+//
+//             string targetId = "[target id]";
+//
+//             string url = "https://vws.vuforia.com";
+//
+//            HttpClient client = new DefaultHttpClient();
+//
+//            Uri vuforiaUri = new Uri(url + "/targets/" + targetId);
+//
+//            var req = new HttpRequestMessage(vuforiaUri);
+//
+//            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(vuforiaUri);
+//
+//             request.Headers.Add(vuforiaUri);
+//
+//             HttpWebResponse webResponse = (HttpWebResponse) request.GetResponse();
+//
+//             if (webResponse.IsSuccessStatusCode)
+//             {
+//                 return Ok(webResponse.Content.ReadAsAsync<ImageReferenceResponse>());
+//             }
+//             else
+//             {
+//                 return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
+//             }
+//             
+//
+//        }
         #endregion
     }
 }
