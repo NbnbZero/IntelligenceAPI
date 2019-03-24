@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Intelligent.API.Framework;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Okta.AspNetCore;
 using Intelligent.Data.AzureFiles;
 using Intelligent.Data.AzureTables;
@@ -33,7 +35,23 @@ namespace Intelligent.API
                     c.DefaultRequestHeaders.Add("User-Agent", "IMR-Public");
                 });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-//            services.AddApiVersioning();
+            //            services.AddApiVersioning();
+
+            var oktaMvcOptions = new OktaMvcOptions();
+            Configuration.GetSection("Okta").Bind(oktaMvcOptions);
+            oktaMvcOptions.Scope = new List<string> { "openid", "profile", "email" };
+            oktaMvcOptions.GetClaimsFromUserInfoEndpoint = true;
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = OktaDefaults.MvcAuthenticationScheme;
+                })
+                .AddCookie()
+                .AddOktaMvc(oktaMvcOptions);
+
+            var mvcBuilder = services.AddMvc();
         }
 
         public void ConfigureStorage()
@@ -66,7 +84,7 @@ namespace Intelligent.API
             {
                 app.UseHsts();
             }
-
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
         }

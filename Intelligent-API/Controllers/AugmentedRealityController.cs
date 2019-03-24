@@ -141,26 +141,17 @@ namespace Intelligent.API.Controllers
 
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-<<<<<<< HEAD
-<<<<<<< HEAD
                 $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}"  );
-=======
                 $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}");
->>>>>>> master
-=======
+
                 $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}"  );
->>>>>>> e8294156a1d68a2e350c6618496ede1394d1d89b
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
 
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> e8294156a1d68a2e350c6618496ede1394d1d89b
                 return Ok(new ImageReferenceResponse()
                 {
                     ImageId = document.Id,
@@ -169,13 +160,8 @@ namespace Intelligent.API.Controllers
                     Metadata = document.Metadata,
                     ImageReference = document.Reference.ToString()
                 });
-<<<<<<< HEAD
-=======
-                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
->>>>>>> master
 
-=======
->>>>>>> e8294156a1d68a2e350c6618496ede1394d1d89b
+                return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
             return BadRequest(resp.Content.ReadAsAsync<IntelligentMixedRealityError>());
         }
 
@@ -211,7 +197,6 @@ namespace Intelligent.API.Controllers
             if (resp.IsSuccessStatusCode)
                 return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
 
-<<<<<<< HEAD
             // Create an entry in the Cosmos DB Document Database
             var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
             {
@@ -235,9 +220,7 @@ namespace Intelligent.API.Controllers
                 Metadata = document.Metadata,
                 ImageReference = document.Reference.ToString()
             });
-=======
             return BadRequest();
->>>>>>> master
         }
 
         /// <summary>
