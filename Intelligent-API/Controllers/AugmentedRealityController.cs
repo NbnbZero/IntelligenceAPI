@@ -50,6 +50,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <returns></returns>
         /// Ben Method
+        [Authorize]
         [HttpGet("{userId}/tag/{imageTag}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
         public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string imageTag, string imageId)
@@ -214,6 +215,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        [Authorize]
         [HttpDelete("{userId}/tag/{imageTag}")]
         public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag)// => throw new NotImplementedException();
         {
@@ -243,6 +245,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageId"></param>
         /// <returns></returns>
         /// ben
+        [Authorize]
         [HttpDelete("{userId}/tag/{imageTag}/image/{imageId}")]
         public async Task<ActionResult<ImageReferenceResponse>> DeleteUserImageAsync(string userId, string imageTag, string imageId)
         {
@@ -274,6 +277,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        [Authorize]
         public async Task<object> GetTagAssociatedModelsAsync(string userId, string imageTag) 
         {
             // Instantiate the request
@@ -297,7 +301,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        /// ben
+        [Authorize]
         [HttpGet("{userId}/tag/{imageTag}/index/{index}")]
         public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, String imageId, int index)
         {
@@ -335,6 +339,7 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag"></param>
         /// <param name="modelId"></param>
         /// <returns></returns>
+        [Authorize]
         public async Task<object> GetTagAssociatedModelAsync(string userId, string imageTag, string modelId) 
         {
             // Instantiate the request
@@ -358,7 +363,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
-        /// ben
+        [Authorize]
         [HttpPost("{userId}/tag/{imageTag}")]
         public async Task<object> UploadTagAssociatedModelAsync(string userId, string imageTag,[FromForm]FileUploadRequest request)
         {
@@ -436,6 +441,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        [Authorize]
         public async Task<object> UpdateTagAssociatedModelAsync(string userId, string imageTag, [FromForm]FileUploadRequest request) 
         {
             // Read the File into a Byte[]
@@ -465,6 +471,7 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
+        [Authorize]
         public async Task<object> DeleteTagAssociatedModelAsync(string userId, string imageTag) 
         {
             // Instantiate the request
