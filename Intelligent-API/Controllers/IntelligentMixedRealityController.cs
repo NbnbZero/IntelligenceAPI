@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Intelligent.API.Controllers
 {
     [ApiController]
-//    [Authorize]  // TODO: Uncomment when ready for authorization
+    [Authorize]  // TODO: Uncomment when ready for authorization
     [Produces(MimeTypes.Application.Json, MimeTypes.Application.Xml)]
     public class IntelligentMixedRealityController : ControllerBase
     {

@@ -50,7 +50,6 @@ namespace Intelligent.API.Controllers
         /// <param name="imageTag">The requested Image's tag.</param>
         /// <returns></returns>
         /// Ben Method
-        [Authorize]
         [HttpGet("{userId}/tag/{imageTag}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
         public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsync(string userId, string imageTag, string imageId)
@@ -87,7 +86,6 @@ namespace Intelligent.API.Controllers
         /// <param name="index">The non-zero based index of the image in the tag set.</param>
         /// <returns></returns>
         /// sophie
-        [Authorize]
         [HttpGet("{userId}/tag/{imageTag}/{index}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, int index)
@@ -116,7 +114,6 @@ namespace Intelligent.API.Controllers
         /// <param name="imageId">The requested Image's ID.</param>
         /// <returns></returns>
         /// implemented
-        [Authorize]
         [HttpGet("{userId}/tag/{imageTag}/image/{imageId}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ImageReferenceResponse))]
         public async Task<ActionResult<ImageReferenceResponse>> GetUserImageAsync(string userId, string imageTag, string imageId)
@@ -126,10 +123,8 @@ namespace Intelligent.API.Controllers
 
             // Instantiate the request
             var req = new HttpRequestMessage(HttpMethod.Get,
-                $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}"  );
                 $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}");
-
-                $"api/augmentedReality/{userId}/tag/{imageTag}/image/{imageId}"  );
+               
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
@@ -158,7 +153,6 @@ namespace Intelligent.API.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         /// implemented
-        [Authorize]
         [HttpPost("{userId}/tag/{imageTag}")]
         [Consumes(MimeTypes.Misc.FormData)]
         [ProducesResponseType((int)HttpStatusCode.Created, Type = typeof(ImageReferenceResponse))]
@@ -183,29 +177,7 @@ namespace Intelligent.API.Controllers
             if (resp.IsSuccessStatusCode)
                 return Ok(resp.Content.ReadAsAsync<ImageReferenceResponse>());
 
-            // Create an entry in the Cosmos DB Document Database
-            var document = await CosmosContext.Instance.CreateDocumentAsync<UploadFileDocument>(new UploadFileDocument()
-            {
-                UserId = userId,
-                FileName = upload.Name, // request.File.FileName,
-                ContentType = request.File.ContentType,
-                Reference = upload.Uri,
-                Metadata = new List<MetaTag>()
-                {
-                    new MetaTag() { Key = "ImageTag", Type = typeof(string).ToString(), Value = imageTag },
-                    new MetaTag() { Key = "Length", Type = typeof(long).ToString(), Value = request.File.Length }
-                }
-            }, UploadFileDocument.Partition);
             
-            // Return a response to the Client
-            return Ok(new ImageReferenceResponse()
-            {
-                ImageId = document.Id,
-                ImageTag = imageTag,
-                FileName = document.FileName,
-                Metadata = document.Metadata,
-                ImageReference = document.Reference.ToString()
-            });
             return BadRequest();
         }
 
@@ -215,7 +187,6 @@ namespace Intelligent.API.Controllers
         /// <param name="userId"></param>
         /// <param name="imageTag"></param>
         /// <returns></returns>
-        [Authorize]
         [HttpDelete("{userId}/tag/{imageTag}")]
         public async Task<object> DeleteUserImageTagSetAsync(string userId, string imageTag)// => throw new NotImplementedException();
         {
@@ -245,7 +216,6 @@ namespace Intelligent.API.Controllers
         /// <param name="imageId"></param>
         /// <returns></returns>
         /// ben
-        [Authorize]
         [HttpDelete("{userId}/tag/{imageTag}/image/{imageId}")]
         public async Task<ActionResult<ImageReferenceResponse>> DeleteUserImageAsync(string userId, string imageTag, string imageId)
         {

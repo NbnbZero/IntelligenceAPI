@@ -20,7 +20,8 @@ namespace Intelligent.API.Services
             this.oktaSettings = oktaSettings;
         }
 
-        public async Task<string> GetToken()
+        //public async Task<string> GetToken()
+        public string getToken()
         {
             if (!this.token.IsValidAndNotExpiring)
             {
