@@ -3,9 +3,9 @@
     "",
     "\\Intelligent-API",
     "\\Intelligent-API\\Controllers",
-    "\\Intelligent.Data",
+    "\\Intelligent-API\\Properties",
+    "\\Intelligent-API\\Properties\\PublishProfiles",
     "\\Postman"
   ],
-  "SelectedNode": "\\Intelligent-API\\Controllers\\AugmentedRealityController.cs",
   "PreviewInSolutionExplorer": false
 }
