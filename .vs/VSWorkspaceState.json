@@ -2,15 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\Intelligent-API",
-    "\\Intelligent-API\\Data",
+    "\\Intelligent-API\\Controllers",
     "\\Intelligent-API\\Properties",
     "\\Intelligent-API\\Properties\\PublishProfiles",
-    "\\Intelligent.Data",
-    "\\Intelligent.Data\\AzureBlobs",
-    "\\Intelligent.Data\\AzureTables",
-    "\\Intelligent.Data\\Cosmos",
-    "\\Intelligent.Data\\Generic"
+    "\\Postman"
   ],
-  "SelectedNode": "\\Intelligent-API\\Startup.cs",
   "PreviewInSolutionExplorer": false
 }
