@@ -14,6 +14,7 @@ using Intelligent.Data.Cosmos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 //TODO: Add usings for vuforia services
 using Intelligent.Data.Cosmos.Models;
 using Intelligent.Data.Generic;
@@ -473,25 +474,27 @@ namespace Intelligent.API.Controllers
         #endregion
 
         #region Augmented Reality - Vuforia
-        
-        //public async Task<object> Summary(string targetId)
-        //{ 
-            //Server Keys
-            //private string accessKey = "server access key";
-            //private string secretKey = "server secret key";
-	
-	        //Database url
-            //private string url = "vuforia url here";
+        [HttpGet("{userId}/tag/{imageTag}")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IList<ImageReferenceResponse>))]
+        public async Task<ActionResult<IList<ImageReferenceResponse>>> GetUserImageTagSetAsyncVuforia(string userId, string imageTag, string imageId)
+        {
+             string accessKey = "[server access key]";
 
-            //private void getSummaryReport() throws URISyntaxException, ClientProtocolException, IOException {
+             string secretKey = "[server secret]";
 
-            //}}
-            //return BadRequest();
-        //};   
+             string targetId = "[target id]";
 
-        
+             string url = "https://vws.vuforia.com";
+            //HttpGet getRequest = new HttpGet();
+            HttpClient client = new DefaultHttpClient();
+            Uri vuforiaUri = new Uri(url + "/targets/" + targetId);
 
-	
+            //wr is request
+            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(vuforiaUri);
+             request.Headers.Add(vuforiaUri);
+             HttpWebResponse webResponse = (HttpWebResponse) request.GetResponse();
+
+        }
         #endregion
     }
 }
