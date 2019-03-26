@@ -60,15 +60,11 @@ namespace Intelligent.API.Controllers
             // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
             //Document should contain parameters that match the variables -- access and compare through `document`
             //info may be in the metadata -- check postman
-            if(document.FileName != imageTag){
+            if(!document.ImageTag.equals(imageTag)||!document.UserId.equals(userId)||!document.Reference.ToString().equals(imageId)){
                 //return response for bad parameters
                 return BadRequest();
             }
-            if(document.UserId != userId){
-                //return response for bad authetication
-                return BadRequest();
-            }
-
+            
             return Ok(new ImageReferenceResponse()
             {
                 ImageTag = imageTag,
@@ -128,7 +124,10 @@ namespace Intelligent.API.Controllers
 
             // Send the request via HttpClient received through Dependency Injection
             var resp = await _imrClient.SendAsync(req);
-
+            if(!document.ImageTag.equals(imageTag)||!document.UserId.equals(userId)||!document.Reference.ToString().equals(imageId)){
+                //return response for bad parameters
+                return BadRequest();
+            }
             // TODO: Handle responses based on the response code from the Private API
             if (resp.IsSuccessStatusCode)
 
@@ -278,18 +277,8 @@ namespace Intelligent.API.Controllers
             // Query for Upload File Document with ID <c>imageId</c>
             var document = await CosmosContext.Instance.GetDocumentAsync<UploadFileDocument>(UploadFileDocument.Partition, imageId);
 
-            // TODO: Verification -- Does the User ID match what was sent? What happens if it doesn't? What about the Image Tag?
-            //Document should contain parameters that match the variables -- access and compare through `document`
-            //info may be in the metadata -- check postman
-            if(document.FileName != imageTag){
+            if(!document.ImageTag.equals(imageTag)||!document.UserId.equals(userId)||!document.Reference.ToString().equals(imageId)){
                 //return response for bad parameters
-                return BadRequest();
-            }
-            if(document.UserId != userId){
-                //return response for bad authetication
-                return BadRequest();
-            }
-            if(document.DocumentId != imageId){
                 return BadRequest();
             }
             return Ok(new ImageReferenceResponse()
