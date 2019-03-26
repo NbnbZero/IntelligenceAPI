@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using Intelligent.API.Framework;
-using Intelligent.API.Models;
-using Intelligent.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Okta.AspNetCore;
 using Intelligent.Data.AzureFiles;
 using Intelligent.Data.AzureTables;
 using Intelligent.Data.Cosmos;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Intelligent.API
 {
@@ -37,44 +32,22 @@ namespace Intelligent.API
                     c.DefaultRequestHeaders.Add("Accept", MimeTypes.Application.Json);
                     c.DefaultRequestHeaders.Add("User-Agent", "IMR-Public");
                 });
-            services.Configure<OktaSettings>(Configuration.GetSection("Okta"));
-            services.AddSingleton<ITokenService, OktaTokenService>();
-            services.AddTransient<IApiService, SimpleApiService>();
 
             services.AddAuthentication(options =>
                 {
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = OktaDefaults.MvcAuthenticationScheme;
                 })
-                .AddJwtBearer(options =>
+                .AddCookie()
+                .AddOktaMvc(new OktaMvcOptions
                 {
-                    options.Authority = "https://dev-510206.oktapreview.com/oauth2/default";
-                    options.Audience = "api://default";
-                    options.RequireHttpsMetadata = false;
+                    OktaDomain = "https://{EDUTechnologic-dev-510206}",
+                    ClientId = "{clientId}",
+                    ClientSecret = "{clientSecret}"
                 });
-
-
-
-
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            //            services.AddApiVersioning();
-      
-//            var oktaMvcOptions = new OktaMvcOptions();
-//            Configuration.GetSection("Okta").Bind(oktaMvcOptions);
-//            // Grab list of updated variables.
-//            oktaMvcOptions.Scope = new List<string> { "openid", "profile", "email" };
-//            oktaMvcOptions.GetClaimsFromUserInfoEndpoint = true;
-//
-//            services.AddAuthentication(options =>
-//                {
-//                    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//                    options.DefaultChallengeScheme = OktaDefaults.MvcAuthenticationScheme;
-//                })
-//                .AddCookie()
-//                .AddOktaMvc(oktaMvcOptions);
-
-            var mvcBuilder = services.AddMvc();
+//            services.AddApiVersioning();
         }
 
         public void ConfigureStorage()
@@ -107,8 +80,9 @@ namespace Intelligent.API
             {
                 app.UseHsts();
             }
-            app.UseAuthentication();
+
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
