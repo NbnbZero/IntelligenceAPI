@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Intelligent.API.Controllers
 {
     [ApiController]
-//    [Authorize]  // TODO: Uncomment when ready for authorization
+    [Authorize]  // TODO: Uncomment when ready for authorization
     [Produces(MimeTypes.Application.Json, MimeTypes.Application.Xml)]
     public class IntelligentMixedRealityController : ControllerBase
     {
