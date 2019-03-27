@@ -23,7 +23,7 @@ namespace Intelligent.API.Services
             var token = tokenService.GetToken();
             //System.Convert.ToBase64String(token);
             //TODO figure out why OKTATOKENSERVICE is not converting to b64 string
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Classic", token);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Classic", token.ToString());
             var res = await client.GetAsync("http://localhost:5000/api/values");
             if (res.IsSuccessStatusCode)
             {

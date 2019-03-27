@@ -21,7 +21,7 @@ namespace Intelligent.API.Services
         }
 
         //public async Task<string> GetToken()
-        public string GetToken()
+        public async Task<string> GetTokenAsync()
         {
             if (!this.token.IsValidAndNotExpiring)
             {
@@ -61,6 +61,11 @@ namespace Intelligent.API.Services
             }
 
             return token;
+        }
+
+        Task<string> ITokenService.GetToken()
+        {
+            throw new NotImplementedException();
         }
 
         private class OktaToken
