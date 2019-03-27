@@ -21,7 +21,7 @@ namespace Intelligent.API.Services
         }
 
         //public async Task<string> GetToken()
-        public string getToken()
+        public string GetToken()
         {
             if (!this.token.IsValidAndNotExpiring)
             {
