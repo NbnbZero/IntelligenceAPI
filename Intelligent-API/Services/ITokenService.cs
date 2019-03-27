@@ -7,6 +7,7 @@ namespace Intelligent.API.Services
 {
     interface ITokenService
     {
+        //Task<string> GetToken();
         Task<string> GetToken();
     }
 }
