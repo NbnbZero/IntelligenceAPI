@@ -43,8 +43,8 @@ namespace Intelligent.API
                 .AddOktaMvc(new OktaMvcOptions
                 {
                     OktaDomain = "https://dev-510206.oktapreview.com",
-                    ClientId = "{clientId}",
-                    ClientSecret = "{clientSecret}"
+                    ClientId = "0oajwtjprlNeIVoWC0h7",
+                    ClientSecret = "Yn4cYeBNYu7yk3J8YIhHvjMX46IOvUcvQbf17VEC"
                 });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 //            services.AddApiVersioning();
