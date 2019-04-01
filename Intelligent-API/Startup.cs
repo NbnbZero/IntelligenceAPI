@@ -42,7 +42,7 @@ namespace Intelligent.API
                 .AddCookie()
                 .AddOktaMvc(new OktaMvcOptions
                 {
-                    OktaDomain = "https://{EDUTechnologic-dev-510206}",
+                    OktaDomain = "https://dev-510206.oktapreview.com",
                     ClientId = "{clientId}",
                     ClientSecret = "{clientSecret}"
                 });
